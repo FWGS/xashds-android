@@ -71,10 +71,8 @@ public class DedicatedActivity extends Activity {
 					SharedPreferences.Editor editor = mPref.edit();
 					editor.putString("argv", cmdArgs.getText().toString());
 					editor.putString("basedir", baseDir.getText().toString());
-					editor.commit();
-					editor.apply();
 					File f = new File(filesDir+"/xash");
-					if(!f.exists())
+					if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("version", 1)) )
 					{
 						//Unpack files now
 						output.append("Unpacking xash... ");
@@ -84,6 +82,17 @@ public class DedicatedActivity extends Activity {
 						output.append("[OK]\nSetting permissions.\n");
 						Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash "  + filesDir + "/qemu-i386-static").waitFor();
 					}
+					editor.putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
+					editor.commit();
+					editor.apply();
+					if( process != null )
+					{
+						process.destroy();
+						process = null;
+						output.append("\nKilling existing server!\n");
+						return;
+					}
+					killAll(filesDir+"/qemu-i386-static");
 					process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir.getText().toString() +" "+ filesDir +"/xash " + cmdArgs.getText().toString());
 					Thread t = new Thread(new Runnable() {
 						public void run() {
@@ -138,7 +147,7 @@ public class DedicatedActivity extends Activity {
 		cmdArgs.setText(mPref.getString("argv","-dev 5 -dll dlls/hl.dll"));
 		baseDir.setText(mPref.getString("basedir","/sdcard/xash"));
 	}
-	void unpackAsset(String name) throws Exception {
+	private void unpackAsset(String name) throws Exception {
 		AssetManager assetManager = getApplicationContext().getAssets();
 		byte[] buffer = new byte[1024];
 		int read;
@@ -150,5 +159,30 @@ public class DedicatedActivity extends Activity {
 		out.close(); 
 		in.close();
 	}
+	private void killAll(String pattern) {
+    try {
+        Process p = Runtime.getRuntime().exec("ps");
+        InputStream is = p.getInputStream();
+        BufferedReader r = new BufferedReader(new InputStreamReader(is));
+        String s;
+        while ((s=r.readLine())!= null) {
+            if (s.contains(pattern)) {
+				String pid = null;
+				for(int i=1; ;i++)
+				{
+					pid = s.split(" ")[i];
+					if(pid.length() > 2)
+						break;
+				}
+				output.append("Found existing process:\n" + s + "\n" + "Pid: " + pid + "\n" );
+				Runtime.getRuntime().exec("kill -9 " + pid).waitFor();
+            }
+        }
+        r.close();
+        p.waitFor();
+    } catch (Exception e) {
+        output.append(e.toString()+"\n");
+    }
+}
 	
 }
