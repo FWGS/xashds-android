@@ -72,7 +72,7 @@ public class DedicatedActivity extends Activity {
 					editor.putString("argv", cmdArgs.getText().toString());
 					editor.putString("basedir", baseDir.getText().toString());
 					File f = new File(filesDir+"/xash");
-					if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("version", 1)) )
+					if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
 					{
 						//Unpack files now
 						output.append("Unpacking xash... ");
