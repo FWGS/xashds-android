@@ -14,6 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.Spinner;
+
+//import android.content.Context;
 import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
@@ -24,14 +29,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.List;
+import java.util.ArrayList;
 
 public class DedicatedActivity extends Activity {
 	static EditText cmdArgs;
 	static EditText baseDir;
 	static TextView output;
+	static ScrollView scroll;
 	static SharedPreferences mPref;
 	static Process process = null;
 	static String filesDir;
+	static String translator = "qemu";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +65,7 @@ public class DedicatedActivity extends Activity {
         baseDir = new EditText(this);
         baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		Button startButton = new Button(this);
-		ScrollView scroll = new ScrollView(this);
+		scroll = new ScrollView(this);
 		
 		// Set launch button title here
 		startButton.setText("Launch!");
@@ -76,11 +85,23 @@ public class DedicatedActivity extends Activity {
 					{
 						//Unpack files now
 						output.append("Unpacking xash... ");
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						unpackAsset("xash");
+						output.append("[OK]\nUnpacking xash_sse2 ...");
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						unpackAsset("xash_sse2");
+						output.append("[OK]\nUnpacking start-translator.sh ...");
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						unpackAsset("start-translator.sh");
+						output.append("[OK]\nUnpacking tracker ...");
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						unpackAsset("tracker");
 						output.append("[OK]\nUnpacking qemu-i386-static ...");
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						unpackAsset("qemu-i386-static");
 						output.append("[OK]\nSetting permissions.\n");
-						Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash "  + filesDir + "/qemu-i386-static").waitFor();
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
 					}
 					editor.putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
 					editor.commit();
@@ -90,10 +111,15 @@ public class DedicatedActivity extends Activity {
 						process.destroy();
 						process = null;
 						output.append("\nKilling existing server!\n");
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						return;
 					}
 					killAll(filesDir+"/qemu-i386-static");
-					process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir.getText().toString() +" "+ filesDir +"/xash " + cmdArgs.getText().toString());
+					killAll(filesDir+"/tracker");
+					if(translator == "qemu")
+						process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir.getText().toString() +" "+ filesDir +"/xash " + cmdArgs.getText().toString());
+					else
+						process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-translator.sh " + filesDir + " " + translator + " " + baseDir.getText().toString() + " " + cmdArgs.getText().toString());
 					Thread t = new Thread(new Runnable() {
 						public void run() {
 							class OutputCallback implements Runnable {
@@ -101,6 +127,13 @@ public class DedicatedActivity extends Activity {
 									OutputCallback(String s) { str = s; }
 									public void run() {
 										output.append(str+"\n");
+										scroll.fullScroll(ScrollView.FOCUS_DOWN);
+										scroll.postDelayed(new Runnable() {
+											@Override
+											public void run() {
+												scroll.fullScroll(ScrollView.FOCUS_DOWN);
+											}
+										}, 100);
 									}
 								}
 							try{
@@ -139,6 +172,30 @@ public class DedicatedActivity extends Activity {
 		launcher.addView(titleView2);
 		launcher.addView(baseDir);
 		// Add other options here
+		
+		final String[] list = listTranslators();
+        if(list.length > 1)
+        {
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+			android.R.layout.simple_spinner_dropdown_item, list);
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			Spinner spinner = new Spinner(this);
+			spinner.setAdapter(adapter);
+			spinner.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+			spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+				@Override
+				public void onItemSelected(AdapterView<?> parent, View view, 
+						int pos, long id) {
+					translator = list[pos];
+				}
+				@Override
+				public void onNothingSelected(AdapterView<?> parent) {
+					translator = "qemu";
+				}
+
+			});
+			launcher.addView(spinner);
+		}
 		launcher.addView(startButton);
 		scroll.addView(output);
 		launcher.addView(scroll);
@@ -160,29 +217,58 @@ public class DedicatedActivity extends Activity {
 		in.close();
 	}
 	private void killAll(String pattern) {
-    try {
-        Process p = Runtime.getRuntime().exec("ps");
-        InputStream is = p.getInputStream();
-        BufferedReader r = new BufferedReader(new InputStreamReader(is));
-        String s;
-        while ((s=r.readLine())!= null) {
-            if (s.contains(pattern)) {
-				String pid = null;
-				for(int i=1; ;i++)
-				{
-					pid = s.split(" ")[i];
-					if(pid.length() > 2)
-						break;
+		try {
+			Process p = Runtime.getRuntime().exec("ps");
+			InputStream is = p.getInputStream();
+			BufferedReader r = new BufferedReader(new InputStreamReader(is));
+			String s;
+			while ((s=r.readLine())!= null) {
+				if (s.contains(pattern)) {
+					String pid = null;
+					for(int i=1; ;i++)
+					{
+						pid = s.split(" ")[i];
+						if(pid.length() > 2)
+							break;
+					}
+					output.append("Found existing process:\n" + s + "\n" + "Pid: " + pid + "\n" );
+					Runtime.getRuntime().exec("kill -9 " + pid).waitFor();
 				}
-				output.append("Found existing process:\n" + s + "\n" + "Pid: " + pid + "\n" );
-				Runtime.getRuntime().exec("kill -9 " + pid).waitFor();
-            }
-        }
-        r.close();
-        p.waitFor();
-    } catch (Exception e) {
-        output.append(e.toString()+"\n");
-    }
-}
-	
+			}
+			r.close();
+			p.waitFor();
+		} 
+		catch (Exception e) {
+			output.append(e.toString()+"\n");
+			scroll.fullScroll(ScrollView.FOCUS_DOWN);
+		}
+	}
+    private String[] listTranslators()
+    {
+		try
+		{
+			String[] list = {
+				"com.eltechs.es",
+				"com.eltechs.erpg",
+				"com.eltechs.doombyeltechs",
+				"com.eltechs.hereticbyeltechs",
+				"ru.buka.petka1"
+				};
+			List<String> list2 = new ArrayList<String>();
+			list2.add("qemu");
+			for(String s : list)
+			{
+				File f = new File("/data/data/" + s + "/lib/libubt.so");
+				if(f.exists())
+					list2.add(s);
+			}
+			
+			return list2.toArray(new String[list2.size()]);
+		}
+		catch(Exception e)
+		{
+			String[] dummy = {"qemu"};
+			return dummy;
+		}
+	}
 }

@@ -2,7 +2,7 @@
 <!-- Set your package name here -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="in.celest.xash3d.dedicated"
-      android:versionCode="2"
+      android:versionCode="3"
       android:versionName="1.0">
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="5"/>
     <!-- Set your application name here -->
@@ -10,7 +10,7 @@
     <!-- Set your launcher title here -->
         <activity android:name=".DedicatedActivity"
                   android:label="XashDS"
-			android:windowSoftInputMode="adjustPan">
+			android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
