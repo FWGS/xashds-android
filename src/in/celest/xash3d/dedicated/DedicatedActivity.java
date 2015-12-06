@@ -35,12 +35,13 @@ import java.util.ArrayList;
 public class DedicatedActivity extends Activity {
 	static EditText cmdArgs;
 	static EditText baseDir;
-	static TextView output;
+	static LinearLayout output;
 	static ScrollView scroll;
 	static SharedPreferences mPref;
 	static Process process = null;
 	static String filesDir;
 	static String translator = "qemu";
+	static boolean isScrolling;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,9 +58,9 @@ public class DedicatedActivity extends Activity {
         titleView2.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         titleView2.setText("Game path");
         titleView2.setTextAppearance(this, android.R.attr.textAppearanceLarge);
-        output = new TextView(this);
-        output.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        output.setTextAppearance(this, android.R.attr.textAppearanceLarge);
+        output = new LinearLayout(this);
+        output.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+        output.setOrientation(LinearLayout.VERTICAL);
         cmdArgs = new EditText(this);
         cmdArgs.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
         baseDir = new EditText(this);
@@ -84,23 +85,23 @@ public class DedicatedActivity extends Activity {
 					if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
 					{
 						//Unpack files now
-						output.append("Unpacking xash... ");
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						printText("Unpacking xash... ");
+						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						unpackAsset("xash");
-						output.append("[OK]\nUnpacking xash_sse2 ...");
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						printText("[OK]\nUnpacking xash_sse2 ...");
+						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						unpackAsset("xash_sse2");
-						output.append("[OK]\nUnpacking start-translator.sh ...");
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						printText("[OK]\nUnpacking start-translator.sh ...");
+						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						unpackAsset("start-translator.sh");
-						output.append("[OK]\nUnpacking tracker ...");
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						printText("[OK]\nUnpacking tracker ...");
+						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						unpackAsset("tracker");
-						output.append("[OK]\nUnpacking qemu-i386-static ...");
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						printText("[OK]\nUnpacking qemu-i386-static ...");
+						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						unpackAsset("qemu-i386-static");
-						output.append("[OK]\nSetting permissions.\n");
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						printText("[OK]\nSetting permissions.\n");
+						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
 					}
 					editor.putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
@@ -108,14 +109,17 @@ public class DedicatedActivity extends Activity {
 					editor.apply();
 					if( process != null )
 					{
-						process.destroy();
+						//process.destroy();
 						process = null;
-						output.append("\nKilling existing server!\n");
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						killAll(filesDir+"/qemu-i386-static");
+						killAll(filesDir+"/tracker");
+						killAll(filesDir+"/ubt");
+						printText("\nKilling existing server!\n");
+						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						return;
 					}
 					killAll(filesDir+"/qemu-i386-static");
-					killAll(filesDir+"/tracker");
+					killAll(filesDir+"/ubt");
 					if(translator == "qemu")
 						process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir.getText().toString() +" "+ filesDir +"/xash " + cmdArgs.getText().toString());
 					else
@@ -126,14 +130,7 @@ public class DedicatedActivity extends Activity {
 									String str;
 									OutputCallback(String s) { str = s; }
 									public void run() {
-										output.append(str+"\n");
-										scroll.fullScroll(ScrollView.FOCUS_DOWN);
-										scroll.postDelayed(new Runnable() {
-											@Override
-											public void run() {
-												scroll.fullScroll(ScrollView.FOCUS_DOWN);
-											}
-										}, 100);
+										printText(str);
 									}
 								}
 							try{
@@ -148,6 +145,7 @@ public class DedicatedActivity extends Activity {
 								reader.close();
 								
 								// Waits for the command to finish.
+								if( process != null )
 								process.waitFor();
 							}
 							catch(Exception e)
@@ -163,7 +161,7 @@ public class DedicatedActivity extends Activity {
 				}
 				catch(Exception e)
 				{
-					output.append(e.toString()+"\n");
+					printText(e.toString()+"\n");
 				}
             }
         });
@@ -231,7 +229,7 @@ public class DedicatedActivity extends Activity {
 						if(pid.length() > 2)
 							break;
 					}
-					output.append("Found existing process:\n" + s + "\n" + "Pid: " + pid + "\n" );
+					printText("Found existing process:\n" + s + "\n" + "Pid: " + pid + "\n" );
 					Runtime.getRuntime().exec("kill -9 " + pid).waitFor();
 				}
 			}
@@ -239,8 +237,8 @@ public class DedicatedActivity extends Activity {
 			p.waitFor();
 		} 
 		catch (Exception e) {
-			output.append(e.toString()+"\n");
-			scroll.fullScroll(ScrollView.FOCUS_DOWN);
+			printText(e.toString()+"\n");
+			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 		}
 	}
     private String[] listTranslators()
@@ -270,5 +268,25 @@ public class DedicatedActivity extends Activity {
 			String[] dummy = {"qemu"};
 			return dummy;
 		}
+	}
+	private void printText(String str)
+	{
+		TextView line = new TextView(this);
+		line.setText(str);
+		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		if(output.getChildCount() > 1024)
+			output.removeViewAt(0);
+		output.addView(line);
+		if( !isScrolling )
+		scroll.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				isScrolling = false;
+			}
+		}, 200);
+		isScrolling = true;
+
+		//croll.fullScroll(ScrollView.FOCUS_DOWN);
 	}
 }
