@@ -120,6 +120,11 @@ public class DedicatedActivity extends Activity {
 					}
 					killAll(filesDir+"/qemu-i386-static");
 					killAll(filesDir+"/ubt");
+					if(translator == "none")
+					{
+						process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-x86.sh " + filesDir + " " + baseDir.getText().toString() + " " + cmdArgs.getText().toString());
+					}
+					else
 					if(translator == "qemu")
 						process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir.getText().toString() +" "+ filesDir +"/xash " + cmdArgs.getText().toString());
 					else
@@ -170,29 +175,33 @@ public class DedicatedActivity extends Activity {
 		launcher.addView(titleView2);
 		launcher.addView(baseDir);
 		// Add other options here
-		
+		if(System.getProperty("ro.product.cpu.abi") == "x86")
+			translator = "none";
+		else
+		{
 		final String[] list = listTranslators();
         if(list.length > 1)
         {
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-			android.R.layout.simple_spinner_dropdown_item, list);
-			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			Spinner spinner = new Spinner(this);
-			spinner.setAdapter(adapter);
-			spinner.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-			spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
-				@Override
-				public void onItemSelected(AdapterView<?> parent, View view, 
-						int pos, long id) {
-					translator = list[pos];
-				}
-				@Override
-				public void onNothingSelected(AdapterView<?> parent) {
-					translator = "qemu";
-				}
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_dropdown_item, list);
+				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				Spinner spinner = new Spinner(this);
+				spinner.setAdapter(adapter);
+				spinner.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+					@Override
+					public void onItemSelected(AdapterView<?> parent, View view, 
+							int pos, long id) {
+						translator = list[pos];
+					}
+					@Override
+					public void onNothingSelected(AdapterView<?> parent) {
+						translator = "qemu";
+					}
 
-			});
-			launcher.addView(spinner);
+				});
+				launcher.addView(spinner);
+			}
 		}
 		launcher.addView(startButton);
 		scroll.addView(output);
