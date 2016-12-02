@@ -2,8 +2,8 @@
 <!-- Set your package name here -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="in.celest.xash3d.dedicated"
-      android:versionCode="4"
-      android:versionName="1.0">
+      android:versionCode="5"
+      android:versionName="1.1">
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="5"/>
     <!-- Set your application name here -->
     <application android:label="XashDS" android:debuggable="true">
