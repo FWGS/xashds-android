@@ -1,6 +1,7 @@
 package in.celest.xash3d.dedicated;
 
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,30 +45,151 @@ public class DedicatedActivity extends Activity {
 	static String filesDir;
 	static String translator = "qemu";
 	static boolean isScrolling;
+
+	static String argsString;
+	static String gamePath;
+
+	static LayoutParams buttonParams;
+
+	static boolean isRunned = false;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+	{
         super.onCreate(savedInstanceState);
 
-        filesDir = getApplicationContext().getFilesDir().getPath();
-        // Build layout
-        LinearLayout launcher = new LinearLayout(this);
-        launcher.setOrientation(LinearLayout.VERTICAL);
-        launcher.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-        TextView titleView = new TextView(this);
-        titleView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        titleView.setText("Command-line arguments");
-        titleView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
-        TextView titleView2 = new TextView(this);
-        titleView2.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        titleView2.setText("Game path");
-        titleView2.setTextAppearance(this, android.R.attr.textAppearanceLarge);
-        output = new LinearLayout(this);
-        output.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-        output.setOrientation(LinearLayout.VERTICAL);
+		buttonParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		buttonParams.gravity = 5;
+
+		initLauncher();
+	}
+
+	private void unpackAsset(String name) throws Exception
+	{
+		AssetManager assetManager = getApplicationContext().getAssets();
+		byte[] buffer = new byte[1024];
+		int read;
+		InputStream in = assetManager.open(name);
+		OutputStream out = new FileOutputStream(filesDir + "/" + name );
+		while((read = in.read(buffer)) != -1){
+			out.write(buffer, 0, read);
+		}
+		out.close(); 
+		in.close();
+	}
+
+	private void killAll(String pattern)
+	{
+		try {
+			Process p = Runtime.getRuntime().exec("ps");
+			InputStream is = p.getInputStream();
+			BufferedReader r = new BufferedReader(new InputStreamReader(is));
+			String s;
+			while ((s=r.readLine())!= null) {
+				if (s.contains(pattern)) {
+					String pid = null;
+					for(int i=1; ;i++)
+					{
+						pid = s.split(" ")[i];
+						if(pid.length() > 2)
+							break;
+					}
+					printText("Found existing process:\n" + s + "\n" + "Pid: " + pid + "\n" );
+					Runtime.getRuntime().exec("kill -9 " + pid).waitFor();
+				}
+			}
+			r.close();
+			p.waitFor();
+		} 
+		catch (Exception e) {
+			printText(e.toString()+"\n");
+			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+		}
+	}
+
+    private String[] listTranslators()
+    {
+		try
+		{
+			String[] list = {
+				"com.eltechs.es",
+				"com.eltechs.erpg",
+				"com.eltechs.doombyeltechs",
+				"com.eltechs.hereticbyeltechs",
+				"ru.buka.petka1"
+				};
+			List<String> list2 = new ArrayList<String>();
+			list2.add("qemu");
+			for(String s : list)
+			{
+				File f = new File("/data/data/" + s + "/lib/libubt.so");
+				if(f.exists())
+					list2.add(s);
+			}
+			
+			return list2.toArray(new String[list2.size()]);
+		}
+		catch(Exception e)
+		{
+			String[] dummy = {"qemu"};
+			return dummy;
+		}
+	}
+
+	private void printText(String str)
+	{
+		TextView line = new TextView(this);
+		line.setText(str);
+		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		if(output.getChildCount() > 1024)
+			output.removeViewAt(0);
+		output.addView(line);
+		if( !isScrolling )
+		scroll.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				isScrolling = false;
+			}
+		}, 200);
+		isScrolling = true;
+
+		//croll.fullScroll(ScrollView.FOCUS_DOWN);
+	}
+
+	void loadSettings()
+	{
+		mPref = getSharedPreferences("dedicated", 0);
+		argsString = mPref.getString("argv","-dev 5 -dll dlls/hl.dll");
+		cmdArgs.setText(argsString);
+		gamePath = mPref.getString("basedir","/sdcard/xash");
+		baseDir.setText(gamePath);
+	}
+
+	void initLauncher()
+	{
+		setTitle("XashDS");
+
+		filesDir = getApplicationContext().getFilesDir().getPath();
+		// Build layout
+		LinearLayout launcher = new LinearLayout(this);
+		launcher.setOrientation(LinearLayout.VERTICAL);
+		launcher.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		TextView titleView = new TextView(this);
+		titleView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		titleView.setText("Command-line arguments");
+		titleView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
+		TextView titleView2 = new TextView(this);
+		titleView2.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		titleView2.setText("Game path");
+		titleView2.setTextAppearance(this, android.R.attr.textAppearanceLarge);
+		output = new LinearLayout(this);
+		output.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		output.setOrientation(LinearLayout.VERTICAL);
 		cmdArgs = new EditText(this);
 		cmdArgs.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-        baseDir = new EditText(this);
-        baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		baseDir = new EditText(this);
+		baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 
 		LinearLayout button_bar = new LinearLayout(this);
 		button_bar.setOrientation(LinearLayout.HORIZONTAL);
@@ -75,10 +197,6 @@ public class DedicatedActivity extends Activity {
 		Button startButton = new Button(this);
 		scroll = new ScrollView(this);
 		Button externalPicker = new Button(this);
-
-
-		LayoutParams buttonParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		buttonParams.gravity = 5;
 
 		externalPicker.setText("Enable external SD RW");
 		externalPicker.setLayoutParams(buttonParams);
@@ -91,18 +209,33 @@ public class DedicatedActivity extends Activity {
 				startActivityForResult(intent, 42);
 			}
 		});
-		
+
+		Button launch_master = new Button(this);
+		launch_master.setText("Launch server master");
+		launch_master.setLayoutParams(buttonParams);
+		launch_master.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				initMaster();
+			}
+		});
+
 		// Set launch button title here
-		startButton.setText("Launch!");
+		startButton.setText("Launch");
 		startButton.setLayoutParams(buttonParams);
 		startButton.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+			@Override
+			public void onClick(View v) {
 				try
 				{
+					isRunned = !isRunned;
+					startButton.setText(isRunned?"Stop":"Launch");
+
 					SharedPreferences.Editor editor = mPref.edit();
-					editor.putString("argv", cmdArgs.getText().toString());
-					editor.putString("basedir", baseDir.getText().toString());
+					argsString = cmdArgs.getText().toString();
+					editor.putString("argv", argsString);
+					gamePath = baseDir.getText().toString();
+					editor.putString("basedir", gamePath);
 					File f = new File(filesDir+"/xash");
 					if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
 					{
@@ -154,14 +287,14 @@ public class DedicatedActivity extends Activity {
 					Thread t = new Thread(new Runnable() {
 						public void run() {
 							class OutputCallback implements Runnable {
-									String str;
-									OutputCallback(String s) { str = s; }
-									public void run() {
-										printText(str);
-									}
+								String str;
+								OutputCallback(String s) { str = s; }
+								public void run() {
+									printText(str);
 								}
+							}
 							try{
-								
+
 								BufferedReader reader = new BufferedReader(
 										new InputStreamReader(process.getInputStream()));
 								int read;
@@ -170,10 +303,10 @@ public class DedicatedActivity extends Activity {
 									runOnUiThread(new OutputCallback(str));
 								}
 								reader.close();
-								
+
 								// Waits for the command to finish.
 								if( process != null )
-								process.waitFor();
+									process.waitFor();
 							}
 							catch(Exception e)
 							{
@@ -184,16 +317,18 @@ public class DedicatedActivity extends Activity {
 							}
 						}
 					});
+
 					t.start();
 				}
 				catch(Exception e)
 				{
 					printText(e.toString()+"\n");
 				}
-            }
-        });
+			}
+		});
 		launcher.addView(titleView);
 		launcher.addView(cmdArgs);
+		launcher.addView(launch_master);
 		launcher.addView(titleView2);
 		launcher.addView(baseDir);
 		// Add other options here
@@ -201,19 +336,19 @@ public class DedicatedActivity extends Activity {
 			translator = "none";
 		else
 		{
-		final String[] list = listTranslators();
-        if(list.length > 1)
-        {
+			final String[] list = listTranslators();
+			if(list.length > 1)
+			{
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_dropdown_item, list);
+						android.R.layout.simple_spinner_dropdown_item, list);
 				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 				Spinner spinner = new Spinner(this);
 				spinner.setAdapter(adapter);
 				spinner.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 				spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
 					@Override
-					public void onItemSelected(AdapterView<?> parent, View view, 
-							int pos, long id) {
+					public void onItemSelected(AdapterView<?> parent, View view,
+											   int pos, long id) {
 						translator = list[pos];
 					}
 					@Override
@@ -226,101 +361,38 @@ public class DedicatedActivity extends Activity {
 			}
 		}
 		button_bar.addView(startButton);
-		button_bar.addView(externalPicker);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  //SD card pick API enabled on 5.0(v21) and higher
+			button_bar.addView(externalPicker);
 		launcher.addView(button_bar);
 		scroll.addView(output);
 		launcher.addView(scroll);
 
-        setContentView(launcher);
-		mPref = getSharedPreferences("dedicated", 0);
-		cmdArgs.setText(mPref.getString("argv","-dev 5 -dll dlls/hl.dll"));
-		baseDir.setText(mPref.getString("basedir","/sdcard/xash"));
-	}
-	private void unpackAsset(String name) throws Exception {
-		AssetManager assetManager = getApplicationContext().getAssets();
-		byte[] buffer = new byte[1024];
-		int read;
-		InputStream in = assetManager.open(name);
-		OutputStream out = new FileOutputStream(filesDir + "/" + name );
-		while((read = in.read(buffer)) != -1){
-			out.write(buffer, 0, read);
-		}
-		out.close(); 
-		in.close();
-	}
-	private void killAll(String pattern) {
-		try {
-			Process p = Runtime.getRuntime().exec("ps");
-			InputStream is = p.getInputStream();
-			BufferedReader r = new BufferedReader(new InputStreamReader(is));
-			String s;
-			while ((s=r.readLine())!= null) {
-				if (s.contains(pattern)) {
-					String pid = null;
-					for(int i=1; ;i++)
-					{
-						pid = s.split(" ")[i];
-						if(pid.length() > 2)
-							break;
-					}
-					printText("Found existing process:\n" + s + "\n" + "Pid: " + pid + "\n" );
-					Runtime.getRuntime().exec("kill -9 " + pid).waitFor();
-				}
-			}
-			r.close();
-			p.waitFor();
-		} 
-		catch (Exception e) {
-			printText(e.toString()+"\n");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-		}
-	}
-    private String[] listTranslators()
-    {
-		try
-		{
-			String[] list = {
-				"com.eltechs.es",
-				"com.eltechs.erpg",
-				"com.eltechs.doombyeltechs",
-				"com.eltechs.hereticbyeltechs",
-				"ru.buka.petka1"
-				};
-			List<String> list2 = new ArrayList<String>();
-			list2.add("qemu");
-			for(String s : list)
-			{
-				File f = new File("/data/data/" + s + "/lib/libubt.so");
-				if(f.exists())
-					list2.add(s);
-			}
-			
-			return list2.toArray(new String[list2.size()]);
-		}
-		catch(Exception e)
-		{
-			String[] dummy = {"qemu"};
-			return dummy;
-		}
-	}
-	private void printText(String str)
-	{
-		TextView line = new TextView(this);
-		line.setText(str);
-		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		if(output.getChildCount() > 1024)
-			output.removeViewAt(0);
-		output.addView(line);
-		if( !isScrolling )
-		scroll.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				scroll.fullScroll(ScrollView.FOCUS_DOWN);
-				isScrolling = false;
-			}
-		}, 200);
-		isScrolling = true;
+		loadSettings();
 
-		//croll.fullScroll(ScrollView.FOCUS_DOWN);
+		setContentView(launcher);
+	}
+
+	void initMaster() {
+		setTitle("XashDS server master");
+
+		LinearLayout master = new LinearLayout(this);
+		master.setOrientation(LinearLayout.VERTICAL);
+		master.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+
+		Button close_master = new Button(this);
+		close_master.setText("Close master");
+		close_master.setLayoutParams(buttonParams);
+		close_master.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				initLauncher();
+			}
+		});
+
+		master.addView(close_master);
+
+		loadSettings();
+
+		setContentView(master);
 	}
 }
