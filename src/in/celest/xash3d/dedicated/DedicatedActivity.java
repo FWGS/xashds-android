@@ -23,6 +23,8 @@ import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.widget.Toast;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.InputStream;
@@ -45,6 +47,7 @@ public class DedicatedActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         filesDir = getApplicationContext().getFilesDir().getPath();
         // Build layout
         LinearLayout launcher = new LinearLayout(this);
@@ -61,17 +64,36 @@ public class DedicatedActivity extends Activity {
         output = new LinearLayout(this);
         output.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
         output.setOrientation(LinearLayout.VERTICAL);
-        cmdArgs = new EditText(this);
-        cmdArgs.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		cmdArgs = new EditText(this);
+		cmdArgs.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
         baseDir = new EditText(this);
         baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+
+		LinearLayout button_bar = new LinearLayout(this);
+		button_bar.setOrientation(LinearLayout.HORIZONTAL);
+		button_bar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		Button startButton = new Button(this);
 		scroll = new ScrollView(this);
+		Button externalPicker = new Button(this);
+
+
+		LayoutParams buttonParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		buttonParams.gravity = 5;
+
+		externalPicker.setText("Enable external SD RW");
+		externalPicker.setLayoutParams(buttonParams);
+		externalPicker.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				printText("Trying to access...");
+
+				Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+				startActivityForResult(intent, 42);
+			}
+		});
 		
 		// Set launch button title here
 		startButton.setText("Launch!");
-		LayoutParams buttonParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		buttonParams.gravity = 5;
 		startButton.setLayoutParams(buttonParams);
 		startButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -203,9 +225,12 @@ public class DedicatedActivity extends Activity {
 				launcher.addView(spinner);
 			}
 		}
-		launcher.addView(startButton);
+		button_bar.addView(startButton);
+		button_bar.addView(externalPicker);
+		launcher.addView(button_bar);
 		scroll.addView(output);
 		launcher.addView(scroll);
+
         setContentView(launcher);
 		mPref = getSharedPreferences("dedicated", 0);
 		cmdArgs.setText(mPref.getString("argv","-dev 5 -dll dlls/hl.dll"));

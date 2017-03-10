@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="s_path_t">Game folder location:</string>
+    <string name="s_args_t">Server command line arguments</string>
+</resources>

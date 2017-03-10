@@ -6,7 +6,9 @@
       android:versionName="1.1">
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="5"/>
     <!-- Set your application name here -->
-    <application android:label="XashDS" android:debuggable="true">
+    <application android:label="XashDS"
+        android:debuggable="true"
+        android:theme="@style/AppTheme">
     <!-- Set your launcher title here -->
         <activity android:name=".DedicatedActivity"
                   android:label="XashDS"
