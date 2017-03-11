@@ -199,7 +199,7 @@ public class DedicatedActivity extends Activity {
 
 	void initLauncher()
 	{
-		setTitle("XashDS");
+		setTitle(R.string.launcher_head);
 
 		filesDir = getApplicationContext().getFilesDir().getPath();
 		// Build layout
@@ -208,11 +208,11 @@ public class DedicatedActivity extends Activity {
 		launcher.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		TextView titleView = new TextView(this);
 		titleView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		titleView.setText("Command-line arguments");
+		titleView.setText(R.string.l_args);
 		titleView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
 		TextView titleView2 = new TextView(this);
 		titleView2.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		titleView2.setText("Game path");
+		titleView2.setText(R.string.l_path);
 		titleView2.setTextAppearance(this, android.R.attr.textAppearanceLarge);
 		output = new LinearLayout(this);
 		output.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
@@ -229,7 +229,7 @@ public class DedicatedActivity extends Activity {
 		scroll = new ScrollView(this);
 		Button externalPicker = new Button(this);
 
-		externalPicker.setText("Enable external SD RW");
+		externalPicker.setText(R.string.b_sd);
 		externalPicker.setLayoutParams(buttonParams);
 		externalPicker.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -244,7 +244,7 @@ public class DedicatedActivity extends Activity {
 		});
 
 		Button launch_master = new Button(this);
-		launch_master.setText("Launch server master");
+		launch_master.setText(R.string.b_master);
 		launch_master.setLayoutParams(buttonParams);
 		launch_master.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -256,7 +256,7 @@ public class DedicatedActivity extends Activity {
 		});
 
 		// Set launch button title here
-		startButton.setText("Launch");
+		startButton.setText(R.string.b_start_launch);
 		startButton.setLayoutParams(buttonParams);
 		startButton.setOnClickListener( new View.OnClickListener() {
 			@Override
@@ -264,7 +264,7 @@ public class DedicatedActivity extends Activity {
 				try
 				{
 					isRunned = !isRunned;
-					startButton.setText(isRunned?"Stop":"Launch");
+					startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 
 					File f = new File(filesDir+"/xash");
 					if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
@@ -391,7 +391,6 @@ public class DedicatedActivity extends Activity {
 		}
 		button_bar.addView(startButton);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  //SD card pick API enabled on 5.0(v21) and higher
-			if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState()))
 			button_bar.addView(externalPicker);
 		launcher.addView(button_bar);
 		scroll.addView(output);
@@ -405,7 +404,7 @@ public class DedicatedActivity extends Activity {
 	}
 
 	void initMaster() {
-		setTitle("XashDS server master");
+		setTitle(R.string.master_head);
 
 		ScrollView masterScroll = new ScrollView(this);
 		
@@ -415,34 +414,34 @@ public class DedicatedActivity extends Activity {
 		
 		TextView gameNameView = new TextView(this);
 		gameNameView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		gameNameView.setText("Game or mod folder name (leave empty if Half-Life)");
+		gameNameView.setText(R.string.l_game);
 		gameNameView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
 
 		TextView gameDllsView = new TextView(this);
 		gameDllsView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		gameDllsView.setText("Game or mod dlls names (relative to mod root)");
+		gameDllsView.setText(R.string.l_dlls);
 		gameDllsView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
 		
 		TextView gameMapView = new TextView(this);
 		gameMapView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		gameMapView.setText("Startup map name");
+		gameMapView.setText(R.string.l_map);
 		gameMapView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
 		
 		modDir = new EditText(this);
 		modDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		modDir.setHint("For example: gearbox, decay");
+		modDir.setHint(R.string.h_game);
 
 		serverDlls = new EditText(this);
 		serverDlls.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		serverDlls.setHint("For example: dlls/decay.dll");
+		serverDlls.setHint(R.string.h_dlls);
 		
 		serverMap = new EditText(this);
 		serverMap.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		serverMap.setHint("For example: crossfire");
+		serverMap.setHint(R.string.h_map);
 		
 		Button saveButton = new Button(this);
 		saveButton.setLayoutParams(buttonParams);
-		saveButton.setText("Save parameters");
+		saveButton.setText(R.string.l_save);
 		saveButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

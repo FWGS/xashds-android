@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="l_path">Расположение папки с игрой:</string>
+    <string name="l_args">Аргументы командной строки сервера:</string>
+	
+	<string name="launcher_head">XashDS</string>
+	<string name="master_head">Настройщик сервера XashDS</string>
+	
+	<string name="b_start_launch">Старт!</string>
+	<string name="b_start_stop">Стоп!</string>
+	
+	<string name="b_sd">Разрешить RW для внешней SD!</string>
+	
+	<string name="b_master">Настройщик сервера</string>
+	
+	<string name="l_save">Сохранить настройки!</string>
+	
+	<string name="l_game">Имя папки с игрой или модом (для Half-Life оставьте пустым)</string>
+	<string name="l_dlls">Пути к dll\'ям сервера (относительно директории мода)</string>
+	<string name="l_map">Имя стартовой карты</string>
+	
+	<string name="h_map">Например: crossfire</string>
+	<string name="h_dlls">Например: dlls/decay.dll</string>
+	<string name="h_game">Например: gearbox; decay</string>
+</resources>

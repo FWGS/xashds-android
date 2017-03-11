@@ -11,8 +11,21 @@ public final class R {
     public static final class attr {
     }
     public static final class string {
-        public static final int s_args_t=0x7f020001;
-        public static final int s_path_t=0x7f020000;
+        public static final int b_master=0x7f020007;
+        public static final int b_sd=0x7f020006;
+        public static final int b_start_launch=0x7f020004;
+        public static final int b_start_stop=0x7f020005;
+        public static final int h_dlls=0x7f02000d;
+        public static final int h_game=0x7f02000e;
+        public static final int h_map=0x7f02000c;
+        public static final int l_args=0x7f020001;
+        public static final int l_dlls=0x7f02000a;
+        public static final int l_game=0x7f020009;
+        public static final int l_map=0x7f02000b;
+        public static final int l_path=0x7f020000;
+        public static final int l_save=0x7f020008;
+        public static final int launcher_head=0x7f020002;
+        public static final int master_head=0x7f020003;
     }
     public static final class style {
         public static final int AppTheme=0x7f030000;

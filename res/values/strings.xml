@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="s_path_t">Game folder location:</string>
-    <string name="s_args_t">Server command line arguments</string>
+    <string name="l_path">Game folder location:</string>
+    <string name="l_args">Server command line arguments:</string>
+	
+	<string name="launcher_head">XashDS</string>
+	<string name="master_head">XashDS server master</string>
+	
+	<string name="b_start_launch">Start!</string>
+	<string name="b_start_stop">Stop!</string>
+	
+	<string name="b_sd">Enable external SD RW!</string>
+	
+	<string name="b_master">Server master</string>
+	
+	<string name="l_save">Save settings!</string>
+	
+	<string name="l_game">Game or mod folder name (leave empty if Half-Life)</string>
+	<string name="l_dlls">Game or mod dlls names (relative to mod root)</string>
+	<string name="l_map">Startup map name</string>
+	
+	<string name="h_map">For example: crossfire</string>
+	<string name="h_dlls">For example: dlls/decay.dll</string>
+	<string name="h_game">For example: gearbox; decay</string>
 </resources>
