@@ -46,6 +46,7 @@ public class DedicatedActivity extends Activity {
 	static EditText modDir;
 	static EditText serverDlls;
 	static EditText serverMap;
+	static EditText rconPass;
 	
 	static SharedPreferences mPref;
 	static Process process = null;
@@ -256,7 +257,7 @@ public class DedicatedActivity extends Activity {
 		});
 
 		// Set launch button title here
-		startButton.setText(R.string.b_start_launch);
+		startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 		startButton.setLayoutParams(buttonParams);
 		startButton.setOnClickListener( new View.OnClickListener() {
 			@Override
@@ -426,6 +427,11 @@ public class DedicatedActivity extends Activity {
 		gameMapView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		gameMapView.setText(R.string.l_map);
 		gameMapView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
+
+		TextView serverPassView = new TextView(this);
+		serverPassView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		serverPassView.setText(R.string.l_rcon);
+		serverPassView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
 		
 		modDir = new EditText(this);
 		modDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
@@ -438,6 +444,9 @@ public class DedicatedActivity extends Activity {
 		serverMap = new EditText(this);
 		serverMap.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		serverMap.setHint(R.string.h_map);
+		
+		rconPass = new EditText(this);
+		rconPass.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		
 		Button saveButton = new Button(this);
 		saveButton.setLayoutParams(buttonParams);
@@ -459,6 +468,8 @@ public class DedicatedActivity extends Activity {
 		master.addView(serverDlls);
 		master.addView(gameMapView);
 		master.addView(serverMap);
+		master.addView(serverPassView);
+		master.addView(rconPass);
 
 		loadSettings();
 		parseArgsToMaster(argsString);
@@ -486,6 +497,7 @@ public class DedicatedActivity extends Activity {
 		if (!modDir.getText().toString().equals("")) ret += makeParamArgString(modDir.getText().toString(), "-game");
 		if (!serverDlls.getText().toString().equals("")) ret += makeParamArgString(serverDlls.getText().toString(), "-dll");
 		if (!serverMap.getText().toString().equals("")) ret += makeParamArgString(serverMap.getText().toString(), "+map");
+		if (!rconPass.getText().toString().equals("")) ret += makeParamArgString(rconPass.getText().toString(), "+rcon_password");
 		return ret;
 	}
 	
@@ -514,6 +526,7 @@ public class DedicatedActivity extends Activity {
 		modDir.setText(parseSingleParameter(args, "-game"));
 		serverDlls.setText(parseMultipleParameter(args, "-dll"));
 		serverMap.setText(parseSingleParameter(args, "+map"));
+		rconPass.setText(parseSingleParameter(args, "+rcon_password"));
 	}
 	
 	public String parseSingleParameter(String args, String param) {
