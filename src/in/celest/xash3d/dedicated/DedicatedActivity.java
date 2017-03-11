@@ -45,6 +45,7 @@ public class DedicatedActivity extends Activity {
 	//views for servrr master screen
 	static EditText modDir;
 	static EditText serverDlls;
+	static EditText serverMap;
 	
 	static SharedPreferences mPref;
 	static Process process = null;
@@ -171,6 +172,30 @@ public class DedicatedActivity extends Activity {
 		gamePath = mPref.getString("basedir","/sdcard/xash");
 		baseDir.setText(gamePath);
 	}
+	
+	void pushLauncherSettings() 
+	{
+		argsString = cmdArgs.getText().toString();
+		gamePath = baseDir.getText().toString();
+	}
+	
+	void pushMasterSettings()
+	{
+		argsString = makeMasterArgs();
+	}
+	
+	void saveSettings() 
+	{
+		SharedPreferences.Editor editor = mPref.edit();
+		editor.putString("argv", argsString);
+		editor.putString("basedir", gamePath);
+		try {
+			editor.putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
+		} catch (Exception e) {}
+		editor.commit();
+		editor.apply();
+		printText("Settings saved!");
+	}
 
 	void initLauncher()
 	{
@@ -224,6 +249,8 @@ public class DedicatedActivity extends Activity {
 		launch_master.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				pushLauncherSettings();
+				saveSettings();
 				initMaster();
 			}
 		});
@@ -239,11 +266,6 @@ public class DedicatedActivity extends Activity {
 					isRunned = !isRunned;
 					startButton.setText(isRunned?"Stop":"Launch");
 
-					SharedPreferences.Editor editor = mPref.edit();
-					argsString = cmdArgs.getText().toString();
-					editor.putString("argv", argsString);
-					gamePath = baseDir.getText().toString();
-					editor.putString("basedir", gamePath);
 					File f = new File(filesDir+"/xash");
 					if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
 					{
@@ -267,9 +289,8 @@ public class DedicatedActivity extends Activity {
 						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 						Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
 					}
-					editor.putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
-					editor.commit();
-					editor.apply();
+					pushLauncherSettings();
+					saveSettings();
 					if( process != null )
 					{
 						//process.destroy();
@@ -402,6 +423,11 @@ public class DedicatedActivity extends Activity {
 		gameDllsView.setText("Game or mod dlls names (relative to mod root)");
 		gameDllsView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
 		
+		TextView gameMapView = new TextView(this);
+		gameMapView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		gameMapView.setText("Startup map name");
+		gameMapView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
+		
 		modDir = new EditText(this);
 		modDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		modDir.setHint("For example: gearbox, decay");
@@ -410,12 +436,30 @@ public class DedicatedActivity extends Activity {
 		serverDlls.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		serverDlls.setHint("For example: dlls/decay.dll");
 		
+		serverMap = new EditText(this);
+		serverMap.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		serverMap.setHint("For example: crossfire");
+		
+		Button saveButton = new Button(this);
+		saveButton.setLayoutParams(buttonParams);
+		saveButton.setText("Save parameters");
+		saveButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				pushMasterSettings();
+				saveSettings();
+			}
+		});
+		
 		masterScroll.addView(master);
 		
+		master.addView(saveButton);
 		master.addView(gameNameView);
 		master.addView(modDir);
 		master.addView(gameDllsView);
 		master.addView(serverDlls);
+		master.addView(gameMapView);
+		master.addView(serverMap);
 
 		loadSettings();
 		parseArgsToMaster(argsString);
@@ -437,9 +481,40 @@ public class DedicatedActivity extends Activity {
 		}
 	}
 	
+	public String makeMasterArgs() 
+	{
+		String ret = "";
+		if (!modDir.getText().toString().equals("")) ret += makeParamArgString(modDir.getText().toString(), "-game");
+		if (!serverDlls.getText().toString().equals("")) ret += makeParamArgString(serverDlls.getText().toString(), "-dll");
+		if (!serverMap.getText().toString().equals("")) ret += makeParamArgString(serverMap.getText().toString(), "+map");
+		return ret;
+	}
+	
+	public String makeParamArgString(String in, String param) 
+	{
+		String ret = "";
+		String temp = "";
+		
+		for (int i = 0; i < in.length(); i++)
+		{
+			if (in.charAt(i) == ',') {
+				ret += param + " " + temp + " ";
+				temp = "";
+				i++;
+			} else {
+				temp += in.charAt(i);
+			}
+		}
+
+		ret += param + " " + temp + " ";
+		
+		return ret;
+	}
+	
 	public void parseArgsToMaster(String args) {
 		modDir.setText(parseSingleParameter(args, "-game"));
 		serverDlls.setText(parseMultipleParameter(args, "-dll"));
+		serverMap.setText(parseSingleParameter(args, "+map"));
 	}
 	
 	public String parseSingleParameter(String args, String param) {
@@ -452,9 +527,12 @@ public class DedicatedActivity extends Activity {
 	
 	public String parseMultipleParameter(String args, String param) {
 		String ret = "";
+		boolean first = true;
 		for (int i = args.indexOf(param); i >= 0; i = args.indexOf(param, i)) {
 			i += new String(param).length() + 1;
-			ret += wordFrom(args, i) + ", ";
+			if (!first) ret += ", ";
+			else first = false;
+			ret += wordFrom(args, i);
 		}
 		return ret;
 	}
