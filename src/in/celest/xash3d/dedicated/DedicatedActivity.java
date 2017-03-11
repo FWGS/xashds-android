@@ -1,8 +1,10 @@
 package in.celest.xash3d.dedicated;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -69,10 +71,12 @@ public class DedicatedActivity extends Activity {
 		buttonParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		buttonParams.gravity = 5;
 
+		isRunned = DedicatedService.isStarted;
+
 		initLauncher();
 	}
 
-	private void unpackAsset(String name) throws Exception
+	public void unpackAsset(String name) throws Exception
 	{
 		AssetManager assetManager = getApplicationContext().getAssets();
 		byte[] buffer = new byte[1024];
@@ -267,29 +271,13 @@ public class DedicatedActivity extends Activity {
 					isRunned = !isRunned;
 					startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 
-					File f = new File(filesDir+"/xash");
-					if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
-					{
-						//Unpack files now
-						printText("Unpacking xash... ");
-						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-						unpackAsset("xash");
-						printText("[OK]\nUnpacking xash_sse2 ...");
-						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-						unpackAsset("xash_sse2");
-						printText("[OK]\nUnpacking start-translator.sh ...");
-						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-						unpackAsset("start-translator.sh");
-						printText("[OK]\nUnpacking tracker ...");
-						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-						unpackAsset("tracker");
-						printText("[OK]\nUnpacking qemu-i386-static ...");
-						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-						unpackAsset("qemu-i386-static");
-						printText("[OK]\nSetting permissions.\n");
-						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-						Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
+					if (isRunned) {
+						startServer();
+					} else {
+						stopServer();
 					}
+
+
 					pushLauncherSettings();
 					saveSettings();
 					if( process != null )
@@ -494,66 +482,30 @@ public class DedicatedActivity extends Activity {
 	public String makeMasterArgs() 
 	{
 		String ret = "";
-		if (!modDir.getText().toString().equals("")) ret += makeParamArgString(modDir.getText().toString(), "-game");
-		if (!serverDlls.getText().toString().equals("")) ret += makeParamArgString(serverDlls.getText().toString(), "-dll");
-		if (!serverMap.getText().toString().equals("")) ret += makeParamArgString(serverMap.getText().toString(), "+map");
-		if (!rconPass.getText().toString().equals("")) ret += makeParamArgString(rconPass.getText().toString(), "+rcon_password");
-		return ret;
-	}
-	
-	public String makeParamArgString(String in, String param) 
-	{
-		String ret = "";
-		String temp = "";
-		
-		for (int i = 0; i < in.length(); i++)
-		{
-			if (in.charAt(i) == ',') {
-				ret += param + " " + temp + " ";
-				temp = "";
-				i++;
-			} else {
-				temp += in.charAt(i);
-			}
-		}
-
-		ret += param + " " + temp + " ";
-		
+		if (!modDir.getText().toString().equals("")) ret += CommandParser.makeParamArgString(modDir.getText().toString(), "-game");
+		if (!serverDlls.getText().toString().equals("")) ret += CommandParser.makeParamArgString(serverDlls.getText().toString(), "-dll");
+		if (!serverMap.getText().toString().equals("")) ret += CommandParser.makeParamArgString(serverMap.getText().toString(), "+map");
+		if (!rconPass.getText().toString().equals("")) ret += CommandParser.makeParamArgString(rconPass.getText().toString(), "+rcon_password");
 		return ret;
 	}
 	
 	public void parseArgsToMaster(String args) {
-		modDir.setText(parseSingleParameter(args, "-game"));
-		serverDlls.setText(parseMultipleParameter(args, "-dll"));
-		serverMap.setText(parseSingleParameter(args, "+map"));
-		rconPass.setText(parseSingleParameter(args, "+rcon_password"));
+		modDir.setText(CommandParser.parseSingleParameter(args, "-game"));
+		serverDlls.setText(CommandParser.parseMultipleParameter(args, "-dll"));
+		serverMap.setText(CommandParser.parseSingleParameter(args, "+map"));
+		rconPass.setText(CommandParser.parseSingleParameter(args, "+rcon_password"));
 	}
-	
-	public String parseSingleParameter(String args, String param) {
-		int i = args.indexOf(param);
-		if (i != -1) {
-			i += new String(param).length() + 1;
-			return wordFrom(args, i);
-		} else return "";
+
+	public void startServer()
+	{
+		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
+		dedicatedServer.putExtra("argv", argsString);
+		dedicatedServer.putExtra("path", gamePath);
+		this.startService(dedicatedServer);
 	}
-	
-	public String parseMultipleParameter(String args, String param) {
-		String ret = "";
-		boolean first = true;
-		for (int i = args.indexOf(param); i >= 0; i = args.indexOf(param, i)) {
-			i += new String(param).length() + 1;
-			if (!first) ret += ", ";
-			else first = false;
-			ret += wordFrom(args, i);
-		}
-		return ret;
-	}
-	
-	public String wordFrom(String in, int index) {
-		String ret = "";
-		for (int i = index; (i < in.length())&&(in.charAt(i) != ' '); i++) {
-			ret += in.charAt(i);
-		}
-		return ret;
+
+	public void stopServer()
+	{
+		stopService(new Intent(DedicatedActivity.this, DedicatedService.class));
 	}
 }

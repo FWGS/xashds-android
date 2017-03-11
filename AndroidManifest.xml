@@ -18,6 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".DedicatedService"
+            android:exported="false"
+            android:enabled="true"/>
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> 
