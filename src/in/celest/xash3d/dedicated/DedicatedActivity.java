@@ -34,12 +34,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.ArrayList;
+import android.os.Environment;
 
 public class DedicatedActivity extends Activity {
+	//views for launcher screen
 	static EditText cmdArgs;
 	static EditText baseDir;
 	static LinearLayout output;
 	static ScrollView scroll;
+	//views for servrr master screen
+	static EditText modDir;
+	static EditText serverDlls;
+	
 	static SharedPreferences mPref;
 	static Process process = null;
 	static String filesDir;
@@ -48,7 +54,7 @@ public class DedicatedActivity extends Activity {
 
 	static String argsString;
 	static String gamePath;
-
+	
 	static LayoutParams buttonParams;
 
 	static boolean isRunned = false;
@@ -194,7 +200,7 @@ public class DedicatedActivity extends Activity {
 		LinearLayout button_bar = new LinearLayout(this);
 		button_bar.setOrientation(LinearLayout.HORIZONTAL);
 		button_bar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		Button startButton = new Button(this);
+		final Button startButton = new Button(this);
 		scroll = new ScrollView(this);
 		Button externalPicker = new Button(this);
 
@@ -207,6 +213,8 @@ public class DedicatedActivity extends Activity {
 
 				Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 				startActivityForResult(intent, 42);
+				
+				initLauncher();
 			}
 		});
 
@@ -362,6 +370,7 @@ public class DedicatedActivity extends Activity {
 		}
 		button_bar.addView(startButton);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  //SD card pick API enabled on 5.0(v21) and higher
+			if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState()))
 			button_bar.addView(externalPicker);
 		launcher.addView(button_bar);
 		scroll.addView(output);
@@ -370,29 +379,91 @@ public class DedicatedActivity extends Activity {
 		loadSettings();
 
 		setContentView(launcher);
+		
+		getActionBar().setDisplayHomeAsUpEnabled(false);
 	}
 
 	void initMaster() {
 		setTitle("XashDS server master");
 
+		ScrollView masterScroll = new ScrollView(this);
+		
 		LinearLayout master = new LinearLayout(this);
 		master.setOrientation(LinearLayout.VERTICAL);
 		master.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		
+		TextView gameNameView = new TextView(this);
+		gameNameView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		gameNameView.setText("Game or mod folder name (leave empty if Half-Life)");
+		gameNameView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
 
-		Button close_master = new Button(this);
-		close_master.setText("Close master");
-		close_master.setLayoutParams(buttonParams);
-		close_master.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				initLauncher();
-			}
-		});
+		TextView gameDllsView = new TextView(this);
+		gameDllsView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		gameDllsView.setText("Game or mod dlls names (relative to mod root)");
+		gameDllsView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
+		
+		modDir = new EditText(this);
+		modDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		modDir.setHint("For example: gearbox, decay");
 
-		master.addView(close_master);
+		serverDlls = new EditText(this);
+		serverDlls.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		serverDlls.setHint("For example: dlls/decay.dll");
+		
+		masterScroll.addView(master);
+		
+		master.addView(gameNameView);
+		master.addView(modDir);
+		master.addView(gameDllsView);
+		master.addView(serverDlls);
 
 		loadSettings();
+		parseArgsToMaster(argsString);
 
-		setContentView(master);
+		setContentView(masterScroll); //let us see that Master-Scroll!
+		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				initLauncher();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	public void parseArgsToMaster(String args) {
+		modDir.setText(parseSingleParameter(args, "-game"));
+		serverDlls.setText(parseMultipleParameter(args, "-dll"));
+	}
+	
+	public String parseSingleParameter(String args, String param) {
+		int i = args.indexOf(param);
+		if (i != -1) {
+			i += new String(param).length() + 1;
+			return wordFrom(args, i);
+		} else return "";
+	}
+	
+	public String parseMultipleParameter(String args, String param) {
+		String ret = "";
+		for (int i = args.indexOf(param); i >= 0; i = args.indexOf(param, i)) {
+			i += new String(param).length() + 1;
+			ret += wordFrom(args, i) + ", ";
+		}
+		return ret;
+	}
+	
+	public String wordFrom(String in, int index) {
+		String ret = "";
+		for (int i = index; (i < in.length())&&(in.charAt(i) != ' '); i++) {
+			ret += in.charAt(i);
+		}
+		return ret;
 	}
 }
