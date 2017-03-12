@@ -49,6 +49,10 @@ public class DedicatedService extends Service {
         //Toast.makeText(this, "Service created",
         //        Toast.LENGTH_SHORT).show();
     }
+    
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
 
     @Override
     public void onStart(Intent intent, int startId) {
