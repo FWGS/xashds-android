@@ -8,6 +8,7 @@
     <!-- Set your application name here -->
     <application android:label="XashDS"
         android:debuggable="true"
+		android:icon="@drawable/logo"
         android:theme="@style/AppTheme">
     <!-- Set your launcher title here -->
         <activity android:name=".DedicatedActivity"
