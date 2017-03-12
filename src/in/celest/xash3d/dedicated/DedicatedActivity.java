@@ -304,7 +304,7 @@ public class DedicatedActivity extends Activity {
 
 					pushLauncherSettings();
 					saveSettings();
-					if( process != null )
+					/*if( process != null )
 					{
 						//process.destroy();
 						process = null;
@@ -360,7 +360,7 @@ public class DedicatedActivity extends Activity {
 						}
 					});
 
-					t.start();
+					t.start();*/
 				}
 				catch(Exception e)
 				{
