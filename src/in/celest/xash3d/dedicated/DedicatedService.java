@@ -49,12 +49,36 @@ public class DedicatedService extends Service {
         //Toast.makeText(this, "Service created",
         //        Toast.LENGTH_SHORT).show();
     }
-    
+
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        filesDir = DedicatedActivity.filesDir;
+        translator = DedicatedActivity.translator;
+        baseDir = DedicatedActivity.gamePath;
+
+        isStarted = true;
+        game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
+        if (game == "") game = "hl";
+        updateNotification("Starting...");
+
+        updateNotification("Extracting...");
+        extractFiles();
+
+        startAction();
+
+        Toast.makeText(this, "Server started",
+                Toast.LENGTH_SHORT).show();
+
+        updateTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updateNotification(DedicatedStatics.lastMessage);
+            }
+        }, 1000, 100);
         return START_STICKY;
     }
 
-    @Override
+    /*@Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
 
@@ -81,7 +105,7 @@ public class DedicatedService extends Service {
 					updateNotification(DedicatedStatics.lastMessage);
 				}
 			}, 1000, 100);
-    }
+    }*/
 	
 	public void updateNotification(String str) 
 	{
