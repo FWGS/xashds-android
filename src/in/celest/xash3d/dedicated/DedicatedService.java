@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import android.app.*;
+import java.util.*;
 
 /**
  * Created by Greg on 11.03.2017.
@@ -26,6 +28,10 @@ public class DedicatedService extends Service {
 
     public static boolean isStarted;
     public static Notification serverNotify;
+	
+	public String game;
+	
+	Timer updateTimer = new Timer();
 
     @Override
     public void onCreate() {
@@ -38,20 +44,33 @@ public class DedicatedService extends Service {
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
         isStarted = true;
-        String game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
+        game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
         if (game == "") game = "hl";
-        Notification.Builder builder = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.logo).setContentTitle("XashDS: "+game).setContentText("Starting...");
-        serverNotify = builder.build();
-        startForeground(777, serverNotify);
+		updateNotification("Starting...");
 
+		updateNotification("Extracting...");
         extractFiles();
-        serverNotify = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.logo).setContentTitle("XashDS: "+game).setContentText("Extracting...").build();
-
+		
         Toast.makeText(this, "Server started",
                 Toast.LENGTH_SHORT).show();
+				
+		updateTimer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					updateNotification(DedicatedStatics.lastMessage);
+				}
+			}, 1000, 100);
     }
+	
+	public void updateNotification(String str) 
+	{
+		Notification.Builder builder = new Notification.Builder(this)
+			.setSmallIcon(R.drawable.logo).setContentTitle("XashDS: "+game).setContentText(str);
+		builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(getApplicationContext(), DedicatedActivity.class), 0));
+        serverNotify = builder.build();
+
+        startForeground(777, serverNotify);
+	}
 
     @Override
     public void onDestroy() {

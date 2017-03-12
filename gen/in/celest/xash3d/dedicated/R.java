@@ -10,25 +10,28 @@ package in.celest.xash3d.dedicated;
 public final class R {
     public static final class attr {
     }
+    public static final class drawable {
+        public static final int logo=0x7f020000;
+    }
     public static final class string {
-        public static final int b_master=0x7f020007;
-        public static final int b_sd=0x7f020006;
-        public static final int b_start_launch=0x7f020004;
-        public static final int b_start_stop=0x7f020005;
-        public static final int h_dlls=0x7f02000e;
-        public static final int h_game=0x7f02000f;
-        public static final int h_map=0x7f02000d;
-        public static final int l_args=0x7f020001;
-        public static final int l_dlls=0x7f02000a;
-        public static final int l_game=0x7f020009;
-        public static final int l_map=0x7f02000b;
-        public static final int l_path=0x7f020000;
-        public static final int l_rcon=0x7f02000c;
-        public static final int l_save=0x7f020008;
-        public static final int launcher_head=0x7f020002;
-        public static final int master_head=0x7f020003;
+        public static final int b_master=0x7f030007;
+        public static final int b_sd=0x7f030006;
+        public static final int b_start_launch=0x7f030004;
+        public static final int b_start_stop=0x7f030005;
+        public static final int h_dlls=0x7f03000e;
+        public static final int h_game=0x7f03000f;
+        public static final int h_map=0x7f03000d;
+        public static final int l_args=0x7f030001;
+        public static final int l_dlls=0x7f03000a;
+        public static final int l_game=0x7f030009;
+        public static final int l_map=0x7f03000b;
+        public static final int l_path=0x7f030000;
+        public static final int l_rcon=0x7f03000c;
+        public static final int l_save=0x7f030008;
+        public static final int launcher_head=0x7f030002;
+        public static final int master_head=0x7f030003;
     }
     public static final class style {
-        public static final int AppTheme=0x7f030000;
+        public static final int AppTheme=0x7f040000;
     }
 }

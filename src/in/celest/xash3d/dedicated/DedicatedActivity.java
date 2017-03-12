@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.util.List;
 import java.util.ArrayList;
 import android.os.Environment;
+import java.util.*;
 
 public class DedicatedActivity extends Activity {
 	//views for launcher screen
@@ -150,6 +151,8 @@ public class DedicatedActivity extends Activity {
 
 	private void printText(String str)
 	{
+		DedicatedStatics.lastMessage = str;
+		
 		TextView line = new TextView(this);
 		line.setText(str);
 		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
@@ -165,7 +168,28 @@ public class DedicatedActivity extends Activity {
 			}
 		}, 200);
 		isScrolling = true;
+		//croll.fullScroll(ScrollView.FOCUS_DOWN);
+	}
+	
+	private void printText(String str, boolean a)
+	{
+		if (a) DedicatedStatics.lastMessage = str;
 
+		TextView line = new TextView(this);
+		line.setText(str);
+		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		if(output.getChildCount() > 1024)
+			output.removeViewAt(0);
+		output.addView(line);
+		if( !isScrolling )
+			scroll.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						isScrolling = false;
+					}
+				}, 200);
+		isScrolling = true;
 		//croll.fullScroll(ScrollView.FOCUS_DOWN);
 	}
 
