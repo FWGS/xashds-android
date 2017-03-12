@@ -69,12 +69,12 @@ public class DedicatedService extends Service {
         Toast.makeText(this, "Server started",
                 Toast.LENGTH_SHORT).show();
 
-        updateTimer.schedule(new TimerTask() {
+        /*updateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 updateNotification(DedicatedStatics.lastMessage);
             }
-        }, 1000, 100);
+        }, 1000, 100);*/
         return START_STICKY;
     }
 
