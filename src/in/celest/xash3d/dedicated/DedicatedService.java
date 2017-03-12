@@ -4,13 +4,16 @@ import android.app.Service;
 import android.app.Notification;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import android.app.*;
 import java.util.*;
@@ -30,19 +33,31 @@ public class DedicatedService extends Service {
     public static Notification serverNotify;
 	
 	public String game;
+
+    private String filesDir;
 	
 	Timer updateTimer = new Timer();
+
+    static Process process = null;
+    static String translator = "qemu";
+    static String baseDir;
+    static String cmdArgs;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(this, "Service created",
-                Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Service created",
+        //        Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
+
+        filesDir = DedicatedActivity.filesDir;
+        translator = DedicatedActivity.translator;
+        baseDir = DedicatedActivity.gamePath;
+
         isStarted = true;
         game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
         if (game == "") game = "hl";
@@ -50,6 +65,8 @@ public class DedicatedService extends Service {
 
 		updateNotification("Extracting...");
         extractFiles();
+
+        startAction();
 		
         Toast.makeText(this, "Server started",
                 Toast.LENGTH_SHORT).show();
@@ -76,8 +93,8 @@ public class DedicatedService extends Service {
     public void onDestroy() {
         super.onDestroy();
         isStarted = false;
-        Toast.makeText(this, "Service destroyed",
-                Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Service destroyed",
+        //        Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -113,7 +130,9 @@ public class DedicatedService extends Service {
     }
 
     public void printText(String text)
-    {   }
+    {
+        updateNotification(text);
+    }
 
     public void unpackAsset(String name) throws Exception
     {
@@ -127,5 +146,106 @@ public class DedicatedService extends Service {
         }
         out.close();
         in.close();
+    }
+
+    public void startAction()
+    {
+        try
+        {
+            if( process != null )
+            {
+                //process.destroy();
+                process = null;
+                killAll(filesDir+"/qemu-i386-static");
+                killAll(filesDir+"/tracker");
+                killAll(filesDir+"/ubt");
+                printText("\nKilling existing server!\n");
+                //scroll.fullScroll(ScrollView.FOCUS_DOWN);
+                return;
+            }
+            killAll(filesDir+"/qemu-i386-static");
+            killAll(filesDir+"/ubt");
+            if(translator == "none")
+            {
+                process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-x86.sh " + filesDir + " " + baseDir + " " + cmdArgs);
+            }
+            else
+            if(translator == "qemu")
+                process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir +" "+ filesDir +"/xash " + cmdArgs);
+            else
+                process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-translator.sh " + filesDir + " " + translator + " " + baseDir + " " + cmdArgs);
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    class OutputCallback implements Runnable {
+                        String str;
+                        OutputCallback(String s) { str = s; }
+                        public void run() {
+                            printText(str);
+                        }
+                    }
+                    try{
+
+                        BufferedReader reader = new BufferedReader(
+                                new InputStreamReader(process.getInputStream()));
+                        int read;
+                        String str = null;
+                        while ((str = reader.readLine()) != null) {
+                            Handler h = new Handler();
+                            h.post(new OutputCallback(str));
+                            //runOnUiThread(new OutputCallback(str));
+                        }
+                        reader.close();
+
+                        // Waits for the command to finish.
+                        if( process != null )
+                            process.waitFor();
+                    }
+                    catch(Exception e)
+                    {
+                        Handler h = new Handler();
+                        h.post(new OutputCallback(e.toString()));
+                        //runOnUiThread(new OutputCallback(e.toString()));
+                    }
+                    finally
+                    {
+                    }
+                }
+            });
+
+            t.start();
+        }
+        catch(Exception e)
+        {
+            printText(e.toString()+"\n");
+        }
+    }
+
+    private void killAll(String pattern)
+    {
+        try {
+            Process p = Runtime.getRuntime().exec("ps");
+            InputStream is = p.getInputStream();
+            BufferedReader r = new BufferedReader(new InputStreamReader(is));
+            String s;
+            while ((s=r.readLine())!= null) {
+                if (s.contains(pattern)) {
+                    String pid = null;
+                    for(int i=1; ;i++)
+                    {
+                        pid = s.split(" ")[i];
+                        if(pid.length() > 2)
+                            break;
+                    }
+                    printText("Found existing process:\n" + s + "\n" + "Pid: " + pid + "\n" );
+                    Runtime.getRuntime().exec("kill -9 " + pid).waitFor();
+                }
+            }
+            r.close();
+            p.waitFor();
+        }
+        catch (Exception e) {
+            printText(e.toString()+"\n");
+            //scroll.fullScroll(ScrollView.FOCUS_DOWN);
+        }
     }
 }
