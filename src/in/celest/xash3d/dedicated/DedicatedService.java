@@ -190,8 +190,8 @@ public class DedicatedService extends Service {
                         int read;
                         String str = null;
                         while ((str = reader.readLine()) != null) {
-                            Handler h = new Handler();
-                            h.post(new OutputCallback(str));
+                            //Handler h = new Handler();
+                            //h.post(new OutputCallback(str));
                             //runOnUiThread(new OutputCallback(str));
                         }
                         reader.close();
@@ -202,8 +202,8 @@ public class DedicatedService extends Service {
                     }
                     catch(Exception e)
                     {
-                        Handler h = new Handler();
-                        h.post(new OutputCallback(e.toString()));
+                        //Handler h = new Handler();
+                        //h.post(new OutputCallback(e.toString()));
                         //runOnUiThread(new OutputCallback(e.toString()));
                     }
                     finally
