@@ -92,6 +92,7 @@ public class DedicatedService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        startAction();
         isStarted = false;
         //Toast.makeText(this, "Service destroyed",
         //        Toast.LENGTH_SHORT).show();
