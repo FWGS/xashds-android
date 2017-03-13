@@ -13,6 +13,12 @@
 	
 	<string name="b_master">Server master</string>
 	
+	<string name="b_close">Close</string>
+	
+	<string name="b_select">Select...</string>
+	
+	<string name="l_notfound">No matching files found</string>
+	
 	<string name="l_save">Save settings!</string>
 	
 	<string name="l_game">Game or mod folder name (leave empty if Half-Life)</string>
@@ -29,4 +35,6 @@
 	<string name="v_islog">Enable log:</string>
 	<string name="v_isdm">Game mode: deathmatch</string>
 	<string name="v_iscoop">Game mode: coop</string>
+	
+	
 </resources>

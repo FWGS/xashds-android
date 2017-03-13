@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.ArrayList;
 import android.os.Environment;
 import java.util.*;
+import android.view.View.*;
 
 public class DedicatedActivity extends Activity {
 	//views for launcher screen
@@ -56,7 +57,6 @@ public class DedicatedActivity extends Activity {
 	static Switch conoleBox;
 	static Switch logBox;
 	static Switch deathmatchSwitch;
-	
 	static SharedPreferences mPref;
 	static Process process = null;
 	static String filesDir;
@@ -364,6 +364,7 @@ public class DedicatedActivity extends Activity {
 		logBox = new Switch(this);
 		logBox.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		logBox.setText(R.string.v_islog);
+		logBox.setEnabled(false);
 
 		deathmatchSwitch = new Switch(this);
 		deathmatchSwitch.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
@@ -390,10 +391,13 @@ public class DedicatedActivity extends Activity {
 		master.addView(saveButton);
 		master.addView(gameNameView);
 		master.addView(modDir);
+		master.addView(makeListButton("", R.string.b_select));
 		master.addView(gameDllsView);
 		master.addView(serverDlls);
+		master.addView(makeListButton("dlls", R.string.b_select));
 		master.addView(gameMapView);
 		master.addView(serverMap);
+		master.addView(makeListButton("maps", R.string.b_select));
 		master.addView(serverPassView);
 		master.addView(rconPass);
 		master.addView(devBox);
@@ -403,18 +407,8 @@ public class DedicatedActivity extends Activity {
 
 		//temporal code
 		//---begin
-		Button b = new Button(this);
-		b.setLayoutParams(buttonParams);
-		b.setText("ABC");
-		b.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent newi = new Intent(DedicatedActivity.this, ListActivity.class);
-				newi.putExtra("folder", "dlls");
-				startActivity(newi);
-			}
-		});
-		master.addView(b);
+		//master.addView(makeListButton("dlls", "Test"));
+		//------END
 
 		loadSettings();
 		parseArgsToMaster(argsString);
@@ -423,6 +417,25 @@ public class DedicatedActivity extends Activity {
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
+	
+	private Button makeListButton(String dir, String txt)
+	{
+		Button b = new Button(this);
+		b.setLayoutParams(buttonParams);
+		b.setText(txt);
+		b.setOnClickListener(new ListViewOpener(dir));
+		return b;
+	}
+	
+	private Button makeListButton(String dir, int txtResId)
+	{
+		Button b = new Button(this);
+		b.setLayoutParams(buttonParams);
+		b.setText(txtResId);
+		b.setOnClickListener(new ListViewOpener(dir));
+		return b;
+	}
+	
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
@@ -482,5 +495,58 @@ public class DedicatedActivity extends Activity {
 	{
 		DedicatedStatics.launched = null;
 		super.onDestroy();
+	}
+	
+	public class ListViewOpener implements View.OnClickListener
+	{
+		String folder;
+		
+		ListViewOpener(String f)
+		{
+			folder = f;
+		}
+
+		@Override
+		public void onClick(View p1)
+		{
+			pushMasterSettings();
+			saveSettings();
+			Intent newi = new Intent(DedicatedActivity.this, ListActivity.class);
+			newi.putExtra("folder", folder);
+			startActivityForResult(newi, 42);
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		if (resultCode == RESULT_OK) {
+			String result = data.getStringExtra("result");
+			final String folder = data.getStringExtra("folder");
+			printText("Returned result: "+result);
+			
+			switch (folder) {
+				case "dlls":
+				if (serverDlls.getText().toString().lastIndexOf(result) == -1) 
+					if (serverDlls.getText().toString().equals("")) serverDlls.append(result);
+						else serverDlls.append(", "+result);
+				break;
+				case "maps":
+				serverMap.setText(result);
+				break;
+				case "":
+				if (!modDir.getText().toString().equals(result)) {
+					serverDlls.setText("");
+					serverMap.setText("");
+				}
+				modDir.setText((result.equals("valve"))?"":result);
+				break;
+			}
+			
+			pushMasterSettings();
+			saveSettings();
+		}
 	}
 }
