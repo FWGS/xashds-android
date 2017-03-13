@@ -233,6 +233,7 @@ public class DedicatedActivity extends Activity {
 				initLauncher();
 			}
 		});
+		externalPicker.setEnabled(false);
 
 		Button launch_master = new Button(this);
 		launch_master.setText(R.string.b_master);
