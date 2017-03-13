@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.content.Intent;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.CheckBox;
@@ -16,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
@@ -45,11 +47,15 @@ public class DedicatedActivity extends Activity {
 	static EditText baseDir;
 	static LinearLayout output;
 	static ScrollView scroll;
-	//views for servrr master screen
+	//views for server master screen
 	static EditText modDir;
 	static EditText serverDlls;
 	static EditText serverMap;
 	static EditText rconPass;
+	static Switch devBox;
+	static Switch conoleBox;
+	static Switch logBox;
+	static Switch deathmatchSwitch;
 	
 	static SharedPreferences mPref;
 	static Process process = null;
@@ -59,6 +65,8 @@ public class DedicatedActivity extends Activity {
 
 	static String argsString;
 	static String gamePath;
+
+	static boolean isDev = false;
 	
 	static LayoutParams buttonParams;
 
@@ -77,20 +85,6 @@ public class DedicatedActivity extends Activity {
 		DedicatedStatics.launched = this;
 
 		initLauncher();
-	}
-
-	public void unpackAsset(String name) throws Exception
-	{
-		AssetManager assetManager = getApplicationContext().getAssets();
-		byte[] buffer = new byte[1024];
-		int read;
-		InputStream in = assetManager.open(name);
-		OutputStream out = new FileOutputStream(filesDir + "/" + name );
-		while((read = in.read(buffer)) != -1){
-			out.write(buffer, 0, read);
-		}
-		out.close(); 
-		in.close();
 	}
 
     private String[] listTranslators()
@@ -172,6 +166,7 @@ public class DedicatedActivity extends Activity {
 	
 	private void pushMasterSettings()
 	{
+
 		argsString = makeMasterArgs();
 	}
 	
@@ -357,6 +352,27 @@ public class DedicatedActivity extends Activity {
 		
 		rconPass = new EditText(this);
 		rconPass.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+
+		devBox = new Switch(this);
+		devBox.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		devBox.setText(R.string.v_isdev);
+
+		conoleBox = new Switch(this);
+		conoleBox.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		conoleBox.setText(R.string.v_isconsole);
+
+		logBox = new Switch(this);
+		logBox.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		logBox.setText(R.string.v_islog);
+
+		deathmatchSwitch = new Switch(this);
+		deathmatchSwitch.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		deathmatchSwitch.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				deathmatchSwitch.setText(deathmatchSwitch.isChecked()?R.string.v_isdm:R.string.v_iscoop);
+			}
+		});
 		
 		Button saveButton = new Button(this);
 		saveButton.setLayoutParams(buttonParams);
@@ -380,6 +396,10 @@ public class DedicatedActivity extends Activity {
 		master.addView(serverMap);
 		master.addView(serverPassView);
 		master.addView(rconPass);
+		master.addView(devBox);
+		master.addView(conoleBox);
+		master.addView(logBox);
+		master.addView(deathmatchSwitch);
 
 		loadSettings();
 		parseArgsToMaster(argsString);
@@ -404,10 +424,15 @@ public class DedicatedActivity extends Activity {
 	public String makeMasterArgs() 
 	{
 		String ret = "";
+		if (devBox.isChecked()) ret += "-dev 3 ";
+		if (conoleBox.isChecked()) ret += "-console ";
+		if (logBox.isChecked()) ret += "-log ";
 		if (!modDir.getText().toString().equals("")) ret += CommandParser.makeParamArgString(modDir.getText().toString(), "-game");
 		if (!serverDlls.getText().toString().equals("")) ret += CommandParser.makeParamArgString(serverDlls.getText().toString(), "-dll");
 		if (!serverMap.getText().toString().equals("")) ret += CommandParser.makeParamArgString(serverMap.getText().toString(), "+map");
 		if (!rconPass.getText().toString().equals("")) ret += CommandParser.makeParamArgString(rconPass.getText().toString(), "+rcon_password");
+		if (deathmatchSwitch.isChecked()) ret += "+deathmatch 1 ";
+		else ret += "+coop 1 ";
 		return ret;
 	}
 	
@@ -416,6 +441,12 @@ public class DedicatedActivity extends Activity {
 		serverDlls.setText(CommandParser.parseMultipleParameter(args, "-dll"));
 		serverMap.setText(CommandParser.parseSingleParameter(args, "+map"));
 		rconPass.setText(CommandParser.parseSingleParameter(args, "+rcon_password"));
+		devBox.setChecked(CommandParser.parseLogicParameter(args, "-dev"));
+		conoleBox.setChecked(CommandParser.parseLogicParameter(args, "-console"));
+		logBox.setChecked(CommandParser.parseLogicParameter(args, "-log"));
+		if (CommandParser.parseSingleParameter(args, "+deathmatch").equals("1")) deathmatchSwitch.setChecked(true);
+		if (CommandParser.parseSingleParameter(args, "+coop").equals("1")) deathmatchSwitch.setChecked(false);
+		deathmatchSwitch.setText(deathmatchSwitch.isChecked()?R.string.v_isdm:R.string.v_iscoop);
 	}
 
 	public void startServer()

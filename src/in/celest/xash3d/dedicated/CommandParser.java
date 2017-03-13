@@ -34,6 +34,13 @@ public class CommandParser {
         } else return "";
     }
 
+    public static boolean parseLogicParameter(String args, String param) {
+        if (args.indexOf(param) != -1)
+        {
+            return true;
+        } else return false;
+    }
+
     public static String parseMultipleParameter(String args, String param) {
         String ret = "";
         boolean first = true;

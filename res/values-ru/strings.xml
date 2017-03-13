@@ -18,6 +18,7 @@
 	<string name="l_game">Имя папки с игрой или модом (для Half-Life оставьте пустым)</string>
 	<string name="l_dlls">Пути к dll\'ям сервера (относительно директории мода)</string>
 	<string name="l_map">Имя стартовой карты</string>
+	<string name="l_rcon">Пароль для удалённого (rcon) контроля</string>
 	
 	<string name="h_map">Например: crossfire</string>
 	<string name="h_dlls">Например: dlls/decay.dll</string>
