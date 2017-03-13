@@ -20,6 +20,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ListActivity"
+            android:label="Xash"
+            android:exported="true"/>
+
         <service android:name=".DedicatedService"
             android:exported="false"
             android:enabled="true"/>

@@ -401,6 +401,21 @@ public class DedicatedActivity extends Activity {
 		master.addView(logBox);
 		master.addView(deathmatchSwitch);
 
+		//temporal code
+		//---begin
+		Button b = new Button(this);
+		b.setLayoutParams(buttonParams);
+		b.setText("ABC");
+		b.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent newi = new Intent(DedicatedActivity.this, ListActivity.class);
+				newi.putExtra("folder", "dlls");
+				startActivity(newi);
+			}
+		});
+		master.addView(b);
+
 		loadSettings();
 		parseArgsToMaster(argsString);
 
