@@ -30,4 +30,10 @@
 	<string name="h_map">Например: crossfire</string>
 	<string name="h_dlls">Например: dlls/decay.dll</string>
 	<string name="h_game">Например: gearbox; decay</string>
+
+	<string name="v_isdev">Включить режим разработчика:</string>
+	<string name="v_isconsole">Включить консоль:</string>
+	<string name="v_islog">Включить логгирование:</string>
+	<string name="v_isdm">Режим игры: deathmatch</string>
+	<string name="v_iscoop">Режим игры: кооператив</string>
 </resources>
