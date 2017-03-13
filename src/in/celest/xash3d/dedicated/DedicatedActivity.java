@@ -73,6 +73,8 @@ public class DedicatedActivity extends Activity {
 		buttonParams.gravity = 5;
 
 		isRunned = DedicatedService.isStarted;
+		
+		DedicatedStatics.launched = this;
 
 		initLauncher();
 	}
@@ -151,8 +153,6 @@ public class DedicatedActivity extends Activity {
 
 	private void printText(String str)
 	{
-		DedicatedStatics.lastMessage = str;
-		
 		TextView line = new TextView(this);
 		line.setText(str);
 		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
@@ -170,29 +170,20 @@ public class DedicatedActivity extends Activity {
 		isScrolling = true;
 		//croll.fullScroll(ScrollView.FOCUS_DOWN);
 	}
-	
-	private void printText(String str, boolean a)
+
+	public void printLog(String strin)
 	{
-		if (a) DedicatedStatics.lastMessage = str;
-
-		TextView line = new TextView(this);
-		line.setText(str);
-		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		if(output.getChildCount() > 1024)
-			output.removeViewAt(0);
-		output.addView(line);
-		if( !isScrolling )
-			scroll.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
-						isScrolling = false;
-					}
-				}, 200);
-		isScrolling = true;
-		//croll.fullScroll(ScrollView.FOCUS_DOWN);
+		class OutputCallback implements Runnable {
+			String str;
+			OutputCallback(String s) { str = s; }
+			public void run() {
+				printText(str);
+			}
+		}
+		
+		runOnUiThread(new OutputCallback(strin));
 	}
-
+	
 	void loadSettings()
 	{
 		mPref = getSharedPreferences("dedicated", 0);
@@ -295,15 +286,14 @@ public class DedicatedActivity extends Activity {
 					isRunned = !isRunned;
 					startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 
+					pushLauncherSettings();
+					saveSettings();
+					
 					if (isRunned) {
 						startServer();
 					} else {
 						stopServer();
 					}
-
-
-					pushLauncherSettings();
-					saveSettings();
 					/*if( process != null )
 					{
 						//process.destroy();
@@ -531,5 +521,12 @@ public class DedicatedActivity extends Activity {
 	public void stopServer()
 	{
 		stopService(new Intent(DedicatedActivity.this, DedicatedService.class));
+	}
+
+	@Override
+	protected void onDestroy()
+	{
+		DedicatedStatics.launched = null;
+		super.onDestroy();
 	}
 }

@@ -55,6 +55,7 @@ public class DedicatedService extends Service {
         filesDir = DedicatedActivity.filesDir;
         translator = DedicatedActivity.translator;
         baseDir = DedicatedActivity.gamePath;
+		cmdArgs = DedicatedActivity.argsString;
 
         isStarted = true;
         game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
@@ -115,6 +116,8 @@ public class DedicatedService extends Service {
         serverNotify = builder.build();
 
         startForeground(777, serverNotify);
+		
+		if (DedicatedStatics.launched != null) DedicatedStatics.launched.printLog(str);
 	}
 
     @Override
