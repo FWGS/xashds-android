@@ -93,35 +93,6 @@ public class DedicatedActivity extends Activity {
 		in.close();
 	}
 
-	private void killAll(String pattern)
-	{
-		try {
-			Process p = Runtime.getRuntime().exec("ps");
-			InputStream is = p.getInputStream();
-			BufferedReader r = new BufferedReader(new InputStreamReader(is));
-			String s;
-			while ((s=r.readLine())!= null) {
-				if (s.contains(pattern)) {
-					String pid = null;
-					for(int i=1; ;i++)
-					{
-						pid = s.split(" ")[i];
-						if(pid.length() > 2)
-							break;
-					}
-					printText("Found existing process:\n" + s + "\n" + "Pid: " + pid + "\n" );
-					Runtime.getRuntime().exec("kill -9 " + pid).waitFor();
-				}
-			}
-			r.close();
-			p.waitFor();
-		} 
-		catch (Exception e) {
-			printText(e.toString()+"\n");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-		}
-	}
-
     private String[] listTranslators()
     {
 		try
@@ -184,7 +155,7 @@ public class DedicatedActivity extends Activity {
 		runOnUiThread(new OutputCallback(strin));
 	}
 	
-	void loadSettings()
+	private void loadSettings()
 	{
 		mPref = getSharedPreferences("dedicated", 0);
 		argsString = mPref.getString("argv","-dev 5 -dll dlls/hl.dll");
@@ -193,18 +164,18 @@ public class DedicatedActivity extends Activity {
 		baseDir.setText(gamePath);
 	}
 	
-	void pushLauncherSettings() 
+	private void pushLauncherSettings() 
 	{
 		argsString = cmdArgs.getText().toString();
 		gamePath = baseDir.getText().toString();
 	}
 	
-	void pushMasterSettings()
+	private void pushMasterSettings()
 	{
 		argsString = makeMasterArgs();
 	}
 	
-	void saveSettings() 
+	private void saveSettings() 
 	{
 		SharedPreferences.Editor editor = mPref.edit();
 		editor.putString("argv", argsString);
@@ -217,7 +188,7 @@ public class DedicatedActivity extends Activity {
 		printText("Settings saved!");
 	}
 
-	void initLauncher()
+	private void initLauncher()
 	{
 		setTitle(R.string.launcher_head);
 
@@ -281,80 +252,16 @@ public class DedicatedActivity extends Activity {
 		startButton.setOnClickListener( new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				try
-				{
-					isRunned = !isRunned;
-					startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
+				isRunned = !isRunned;
+				startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 
-					pushLauncherSettings();
-					saveSettings();
+				pushLauncherSettings();
+				saveSettings();
 					
-					if (isRunned) {
-						startServer();
-					} else {
-						stopServer();
-					}
-					/*if( process != null )
-					{
-						//process.destroy();
-						process = null;
-						killAll(filesDir+"/qemu-i386-static");
-						killAll(filesDir+"/tracker");
-						killAll(filesDir+"/ubt");
-						printText("\nKilling existing server!\n");
-						//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-						return;
-					}
-					killAll(filesDir+"/qemu-i386-static");
-					killAll(filesDir+"/ubt");
-					if(translator == "none")
-					{
-						process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-x86.sh " + filesDir + " " + baseDir.getText().toString() + " " + cmdArgs.getText().toString());
-					}
-					else
-					if(translator == "qemu")
-						process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir.getText().toString() +" "+ filesDir +"/xash " + cmdArgs.getText().toString());
-					else
-						process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-translator.sh " + filesDir + " " + translator + " " + baseDir.getText().toString() + " " + cmdArgs.getText().toString());
-					Thread t = new Thread(new Runnable() {
-						public void run() {
-							class OutputCallback implements Runnable {
-								String str;
-								OutputCallback(String s) { str = s; }
-								public void run() {
-									printText(str);
-								}
-							}
-							try{
-
-								BufferedReader reader = new BufferedReader(
-										new InputStreamReader(process.getInputStream()));
-								int read;
-								String str = null;
-								while ((str = reader.readLine()) != null) {
-									runOnUiThread(new OutputCallback(str));
-								}
-								reader.close();
-
-								// Waits for the command to finish.
-								if( process != null )
-									process.waitFor();
-							}
-							catch(Exception e)
-							{
-								runOnUiThread(new OutputCallback(e.toString()));
-							}
-							finally
-							{
-							}
-						}
-					});
-
-					t.start();*/
-				}
-				catch(Exception e)
-				{
-					printText(e.toString()+"\n");
+				if (isRunned) {
+					startServer();
+				} else {
+					stopServer();
 				}
 			}
 		});

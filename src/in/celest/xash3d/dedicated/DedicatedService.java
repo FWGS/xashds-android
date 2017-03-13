@@ -35,8 +35,6 @@ public class DedicatedService extends Service {
 	public String game;
 
     private String filesDir;
-	
-	Timer updateTimer = new Timer();
 
     static Process process = null;
     static String translator = "qemu";
@@ -46,8 +44,7 @@ public class DedicatedService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        //Toast.makeText(this, "Service created",
-        //        Toast.LENGTH_SHORT).show();
+		printText("Service created!");
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -67,46 +64,10 @@ public class DedicatedService extends Service {
 
         startAction();
 
-        Toast.makeText(this, "Server started",
-                Toast.LENGTH_SHORT).show();
-
-        /*updateTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                updateNotification(DedicatedStatics.lastMessage);
-            }
-        }, 1000, 100);*/
+		printText("Service started!");
+				
         return START_STICKY;
     }
-
-    /*@Override
-    public void onStart(Intent intent, int startId) {
-        super.onStart(intent, startId);
-
-        filesDir = DedicatedActivity.filesDir;
-        translator = DedicatedActivity.translator;
-        baseDir = DedicatedActivity.gamePath;
-
-        isStarted = true;
-        game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
-        if (game == "") game = "hl";
-		updateNotification("Starting...");
-
-		updateNotification("Extracting...");
-        extractFiles();
-
-        startAction();
-		
-        Toast.makeText(this, "Server started",
-                Toast.LENGTH_SHORT).show();
-				
-		updateTimer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					updateNotification(DedicatedStatics.lastMessage);
-				}
-			}, 1000, 100);
-    }*/
 	
 	public void updateNotification(String str) 
 	{
@@ -125,9 +86,8 @@ public class DedicatedService extends Service {
         super.onDestroy();
         startAction();
         isStarted = false;
-        //Toast.makeText(this, "Service destroyed",
-        //        Toast.LENGTH_SHORT).show();
-    }
+		printText("Service destroyed.");
+	}
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -141,21 +101,15 @@ public class DedicatedService extends Service {
             if (!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != DedicatedActivity.mPref.getInt("lastversion", 1))) {
                 //Unpack files now
                 printText("Unpacking xash... ");
-                //scroll.fullScroll(ScrollView.FOCUS_DOWN);
                 unpackAsset("xash");
                 printText("[OK]\nUnpacking xash_sse2 ...");
-                //scroll.fullScroll(ScrollView.FOCUS_DOWN);
                 unpackAsset("xash_sse2");
                 printText("[OK]\nUnpacking start-translator.sh ...");
-                //scroll.fullScroll(ScrollView.FOCUS_DOWN);
                 unpackAsset("start-translator.sh");
                 printText("[OK]\nUnpacking tracker ...");
-                //scroll.fullScroll(ScrollView.FOCUS_DOWN);
                 unpackAsset("tracker");
                 printText("[OK]\nUnpacking qemu-i386-static ...");
-                //scroll.fullScroll(ScrollView.FOCUS_DOWN);
                 printText("[OK]\nSetting permissions.\n");
-                //scroll.fullScroll(ScrollView.FOCUS_DOWN);
                 Runtime.getRuntime().exec("chmod 777 " + DedicatedActivity.filesDir + "/xash " + DedicatedActivity.filesDir + "/xash_sse2 " + DedicatedActivity.filesDir + "/tracker " + DedicatedActivity.filesDir + "/qemu-i386-static").waitFor();
             }
         } catch (Exception e) {}
@@ -186,13 +140,11 @@ public class DedicatedService extends Service {
         {
             if( process != null )
             {
-                //process.destroy();
                 process = null;
                 killAll(filesDir+"/qemu-i386-static");
                 killAll(filesDir+"/tracker");
                 killAll(filesDir+"/ubt");
                 printText("\nKilling existing server!\n");
-                //scroll.fullScroll(ScrollView.FOCUS_DOWN);
                 return;
             }
             killAll(filesDir+"/qemu-i386-static");
@@ -219,14 +171,10 @@ public class DedicatedService extends Service {
 
                         BufferedReader reader = new BufferedReader(
                                 new InputStreamReader(process.getInputStream()));
-                        int read;
                         String str = null;
                         while ((str = reader.readLine()) != null) {
                             printText(str);
-                            //Handler h = new Handler();
-                            //h.post(new OutputCallback(str));
-                            //runOnUiThread(new OutputCallback(str));
-                        }
+							}
                         reader.close();
 
                         // Waits for the command to finish.
@@ -236,9 +184,6 @@ public class DedicatedService extends Service {
                     catch(Exception e)
                     {
                         printText(e.toString());
-                        //Handler h = new Handler();
-                        //h.post(new OutputCallback(e.toString()));
-                        //runOnUiThread(new OutputCallback(e.toString()));
                     }
                     finally
                     {
@@ -279,7 +224,6 @@ public class DedicatedService extends Service {
         }
         catch (Exception e) {
             printText(e.toString()+"\n");
-            //scroll.fullScroll(ScrollView.FOCUS_DOWN);
         }
     }
 }
