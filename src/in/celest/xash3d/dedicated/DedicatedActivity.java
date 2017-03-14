@@ -82,6 +82,7 @@ public class DedicatedActivity extends Activity {
 
 		isRunned = DedicatedService.isStarted;
 		
+		if (DedicatedStatics.launched != null) DedicatedStatics.launched.finish();
 		DedicatedStatics.launched = this;
 
 		initLauncher();
@@ -132,6 +133,7 @@ public class DedicatedActivity extends Activity {
 				isScrolling = false;
 			}
 		}, 200);
+		
 		isScrolling = true;
 		//croll.fullScroll(ScrollView.FOCUS_DOWN);
 	}
@@ -203,6 +205,12 @@ public class DedicatedActivity extends Activity {
 		output = new LinearLayout(this);
 		output.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		output.setOrientation(LinearLayout.VERTICAL);
+		
+		for (int i = 0; i < DedicatedStatics.logView.size(); i++)
+		{
+			printText(DedicatedStatics.logView.get(i));
+		}
+		
 		cmdArgs = new EditText(this);
 		cmdArgs.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		baseDir = new EditText(this);

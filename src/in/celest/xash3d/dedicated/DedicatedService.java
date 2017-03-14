@@ -79,6 +79,9 @@ public class DedicatedService extends Service {
         startForeground(777, serverNotify);
 		
 		if (DedicatedStatics.launched != null) DedicatedStatics.launched.printLog(str);
+		
+		DedicatedStatics.logView.add(str);
+		if (DedicatedStatics.logView.size() >= 1023) DedicatedStatics.logView.remove(0);
 	}
 
     @Override
