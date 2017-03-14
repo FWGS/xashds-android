@@ -17,6 +17,8 @@
 	
 	<string name="b_select">Select...</string>
 	
+	<string name="b_start_xash">Join game...</string>
+	
 	<string name="l_notfound">No matching files found</string>
 	
 	<string name="l_save">Save settings!</string>
@@ -35,6 +37,4 @@
 	<string name="v_islog">Enable log:</string>
 	<string name="v_isdm">Game mode: deathmatch</string>
 	<string name="v_iscoop">Game mode: coop</string>
-	
-	
 </resources>

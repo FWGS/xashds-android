@@ -16,6 +16,8 @@
 	<string name="b_close">Закрыть</string>
 
 	<string name="b_select">Выбор...</string>
+	
+	<string name="b_start_xash">Подключиться к игре...</string>
 
 	<string name="l_notfound">Подходящие файлы не найдены</string>
 	

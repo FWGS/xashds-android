@@ -249,6 +249,16 @@ public class DedicatedActivity extends Activity {
 				initMaster();
 			}
 		});
+		
+		Button launchXash = new Button(this);
+		launchXash.setText(R.string.b_start_xash);
+		launchXash.setLayoutParams(buttonParams);
+		launchXash.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					startXash();
+				}
+			});
 
 		// Set launch button title here
 		startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
@@ -304,8 +314,9 @@ public class DedicatedActivity extends Activity {
 			}
 		}
 		button_bar.addView(startButton);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  //SD card pick API enabled on 5.0(v21) and higher
-			button_bar.addView(externalPicker);
+		//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  //SD card pick API enabled on 5.0(v21) and higher
+			//button_bar.addView(externalPicker);
+		button_bar.addView(launchXash);
 		launcher.addView(button_bar);
 		scroll.addView(output);
 		launcher.addView(scroll);
@@ -557,4 +568,15 @@ public class DedicatedActivity extends Activity {
 			saveSettings();
 		}
 	}
+	
+	public void startXash()
+    {
+		Intent intent = new Intent();
+		intent.setAction("in.celest.xash3d.START");
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
+		intent.putExtra("argv", "+connect localhost:27015");
+		intent.putExtra("gamedir", CommandParser.parseSingleParameter(argsString, "-game"));
+		startActivity(intent);
+    }
 }
