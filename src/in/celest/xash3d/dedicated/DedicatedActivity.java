@@ -316,7 +316,7 @@ public class DedicatedActivity extends Activity {
 		button_bar.addView(startButton);
 		//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  //SD card pick API enabled on 5.0(v21) and higher
 			//button_bar.addView(externalPicker);
-		button_bar.addView(launchXash);
+		if (isXashInstalled()) button_bar.addView(launchXash);
 		launcher.addView(button_bar);
 		scroll.addView(output);
 		launcher.addView(scroll);
@@ -423,11 +423,6 @@ public class DedicatedActivity extends Activity {
 		master.addView(conoleBox);
 		master.addView(logBox);
 		master.addView(deathmatchSwitch);
-
-		//temporal code
-		//---begin
-		//master.addView(makeListButton("dlls", "Test"));
-		//------END
 
 		loadSettings();
 		parseArgsToMaster(argsString);
@@ -579,4 +574,15 @@ public class DedicatedActivity extends Activity {
 		intent.putExtra("gamedir", CommandParser.parseSingleParameter(argsString, "-game"));
 		startActivity(intent);
     }
+
+    public boolean isXashInstalled()
+	{
+		try
+		{
+			getPackageManager().getPackageInfo("in.celest.xash3d.hl", PackageManager.GET_ACTIVITIES);
+			return true;
+		} catch (PackageManager.NameNotFoundException e) {}
+
+		return false;
+	}
 }
