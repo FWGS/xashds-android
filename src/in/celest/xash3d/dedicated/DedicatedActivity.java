@@ -566,12 +566,7 @@ public class DedicatedActivity extends Activity {
 	
 	public void startXash()
     {
-		Intent intent = new Intent();
-		intent.setAction("in.celest.xash3d.START");
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		
-		intent.putExtra("argv", "+connect localhost:27015");
-		intent.putExtra("gamedir", CommandParser.parseSingleParameter(argsString, "-game"));
+		Intent intent = new Intent(this, ConnectActivity.class);
 		startActivity(intent);
     }
 

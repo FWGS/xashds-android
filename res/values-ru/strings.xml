@@ -19,6 +19,9 @@
 	
 	<string name="b_start_xash">Подключиться к игре...</string>
 
+	<string name="b_start_xash_connect">Использовать \"+connect\"</string>
+	<string name="b_start_xash_hacks">Использовать xashds hacks</string>
+	
 	<string name="l_notfound">Подходящие файлы не найдены</string>
 	
 	

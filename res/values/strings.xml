@@ -19,6 +19,9 @@
 	
 	<string name="b_start_xash">Join game...</string>
 	
+	<string name="b_start_xash_connect">Use \"+connect\"</string>
+	<string name="b_start_xash_hacks">Use xashds hacks</string>
+	
 	<string name="l_notfound">No matching files found</string>
 	
 	<string name="l_save">Save settings!</string>
