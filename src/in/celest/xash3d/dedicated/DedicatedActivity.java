@@ -48,6 +48,7 @@ public class DedicatedActivity extends Activity {
 	static EditText baseDir;
 	static LinearLayout output;
 	static ScrollView scroll;
+	static Spinner translatorSelector;
 	//views for server master screen
 	static EditText modDir;
 	static EditText serverDlls;
@@ -158,6 +159,7 @@ public class DedicatedActivity extends Activity {
 		cmdArgs.setText(argsString);
 		gamePath = mPref.getString("basedir","/sdcard/xash");
 		baseDir.setText(gamePath);
+		translatorSelector.setSelection(mPref.getInt("translator", 0));
 	}
 	
 	private void pushLauncherSettings() 
@@ -177,6 +179,7 @@ public class DedicatedActivity extends Activity {
 		SharedPreferences.Editor editor = mPref.edit();
 		editor.putString("argv", argsString);
 		editor.putString("basedir", gamePath);
+		editor.putInt("translator", translatorSelector.getSelectedItemPosition());
 		try {
 			editor.putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
 		} catch (Exception e) {}
@@ -295,10 +298,10 @@ public class DedicatedActivity extends Activity {
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 						android.R.layout.simple_spinner_dropdown_item, list);
 				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-				Spinner spinner = new Spinner(this);
-				spinner.setAdapter(adapter);
-				spinner.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-				spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+				translatorSelector = new Spinner(this);
+				translatorSelector.setAdapter(adapter);
+				translatorSelector.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				translatorSelector.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
 					@Override
 					public void onItemSelected(AdapterView<?> parent, View view,
 											   int pos, long id) {
@@ -310,7 +313,7 @@ public class DedicatedActivity extends Activity {
 					}
 
 				});
-				launcher.addView(spinner);
+				launcher.addView(translatorSelector);
 			}
 		}
 		button_bar.addView(startButton);
@@ -508,7 +511,15 @@ public class DedicatedActivity extends Activity {
 	protected void onDestroy()
 	{
 		DedicatedStatics.launched = null;
+		saveSettings();
 		super.onDestroy();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		saveSettings();
+		super.onPause();
 	}
 	
 	public class ListViewOpener implements View.OnClickListener

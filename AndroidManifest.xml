@@ -22,7 +22,8 @@
 
         <activity android:name=".ListActivity"
             android:label="XashDS"
-            android:exported="true"/>
+            android:exported="true"
+			android:theme="@style/AppDialog"/>
 		
 		<activity android:name=".ConnectActivity"
 			android:label="Connect..."
