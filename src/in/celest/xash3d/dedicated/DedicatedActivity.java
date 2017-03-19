@@ -85,8 +85,6 @@ public class DedicatedActivity extends Activity {
 		
 		if (DedicatedStatics.launched != null) DedicatedStatics.launched.finish();
 		DedicatedStatics.launched = this;
-
-		mPref = getSharedPreferences("dedicated", 0);
 		
 		initLauncher();
 	}
@@ -156,11 +154,13 @@ public class DedicatedActivity extends Activity {
 	
 	private void loadSettings()
 	{
+		mPref = getSharedPreferences("dedicated", 0);
 		argsString = mPref.getString("argv","-dev 5 -dll dlls/hl.dll");
 		cmdArgs.setText(argsString);
 		gamePath = mPref.getString("basedir","/sdcard/xash");
 		baseDir.setText(gamePath);
-		translatorSelector.setSelection(mPref.getInt("translator", 0));
+		if (translatorSelector != null)
+			if (mPref.getInt("translator", 0) < translatorSelector.getCount()) translatorSelector.setSelection(mPref.getInt("translator", 1));
 	}
 	
 	private void pushLauncherSettings() 
@@ -434,15 +434,6 @@ public class DedicatedActivity extends Activity {
 		setContentView(masterScroll); //let us see that Master-Scroll!
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-	}
-	
-	private Button makeListButton(String dir, String txt)
-	{
-		Button b = new Button(this);
-		b.setLayoutParams(buttonParams);
-		b.setText(txt);
-		b.setOnClickListener(new ListViewOpener(dir));
-		return b;
 	}
 	
 	private Button makeListButton(String dir, int txtResId)

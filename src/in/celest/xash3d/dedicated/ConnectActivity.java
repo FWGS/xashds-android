@@ -24,7 +24,7 @@ public class ConnectActivity extends Activity
 		Button xacksButton = new Button(this);
 		xacksButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		xacksButton.setText(R.string.b_start_xash_hacks);
-		xacksButton.setOnClickListener(new OnClickListener() {
+		xacksButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v)
 			{
@@ -36,7 +36,7 @@ public class ConnectActivity extends Activity
 		Button connectButton = new Button(this);
 		connectButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		connectButton.setText(R.string.b_start_xash_connect);
-		connectButton.setOnClickListener(new OnClickListener() {
+		connectButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v)
 				{
@@ -48,7 +48,7 @@ public class ConnectActivity extends Activity
 		Button closeButton = new Button(this);
 		closeButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		closeButton.setText(R.string.b_close);
-		closeButton.setOnClickListener(new OnClickListener() {
+		closeButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v)
 				{
