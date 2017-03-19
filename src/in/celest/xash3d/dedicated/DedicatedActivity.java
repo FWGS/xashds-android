@@ -86,6 +86,8 @@ public class DedicatedActivity extends Activity {
 		if (DedicatedStatics.launched != null) DedicatedStatics.launched.finish();
 		DedicatedStatics.launched = this;
 
+		mPref = getSharedPreferences("dedicated", 0);
+		
 		initLauncher();
 	}
 
@@ -154,7 +156,6 @@ public class DedicatedActivity extends Activity {
 	
 	private void loadSettings()
 	{
-		mPref = getSharedPreferences("dedicated", 0);
 		argsString = mPref.getString("argv","-dev 5 -dll dlls/hl.dll");
 		cmdArgs.setText(argsString);
 		gamePath = mPref.getString("basedir","/sdcard/xash");
@@ -496,6 +497,33 @@ public class DedicatedActivity extends Activity {
 
 	public void startServer()
 	{
+		File f = new File(filesDir+"/xash");
+		try 
+		{
+
+		if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
+		{
+			//Unpack files now
+			printText("Unpacking xash... ");
+			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+			unpackAsset("xash");
+			printText("[OK]\nUnpacking xash_sse2 ...");
+			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+			unpackAsset("xash_sse2");
+			printText("[OK]\nUnpacking start-translator.sh ...");
+			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+			unpackAsset("start-translator.sh");
+			printText("[OK]\nUnpacking tracker ...");
+			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+			unpackAsset("tracker");
+			printText("[OK]\nUnpacking qemu-i386-static ...");
+			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+			unpackAsset("qemu-i386-static");
+			printText("[OK]\nSetting permissions.\n");
+			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+			Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
+		}
+		} catch (Exception e) {}
 		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
 		dedicatedServer.putExtra("argv", argsString);
 		dedicatedServer.putExtra("path", gamePath);
@@ -590,5 +618,18 @@ public class DedicatedActivity extends Activity {
 		} catch (PackageManager.NameNotFoundException e) {}
 
 		return false;
+	}
+	
+	public void unpackAsset(String name) throws Exception {
+		AssetManager assetManager = getApplicationContext().getAssets();
+		byte[] buffer = new byte[1024];
+		int read;
+		InputStream in = assetManager.open(name);
+		OutputStream out = new FileOutputStream(filesDir + "/" + name );
+		while((read = in.read(buffer)) != -1){
+			out.write(buffer, 0, read);
+		}
+		out.close(); 
+		in.close();
 	}
 }

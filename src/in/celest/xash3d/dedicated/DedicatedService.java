@@ -59,9 +59,6 @@ public class DedicatedService extends Service {
         if (game == "") game = "hl";
         updateNotification("Starting...");
 
-        updateNotification("Extracting...");
-        extractFiles();
-
         startAction();
 
 		printText("Service started!");
@@ -97,46 +94,11 @@ public class DedicatedService extends Service {
         return null;
     }
 
-    public void extractFiles()
-    {
-        try {
-            File f = new File(DedicatedActivity.filesDir + "/xash");
-            if (!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != DedicatedActivity.mPref.getInt("lastversion", 1))) {
-                //Unpack files now
-                printText("Unpacking xash... ");
-                unpackAsset("xash");
-                printText("[OK]\nUnpacking xash_sse2 ...");
-                unpackAsset("xash_sse2");
-                printText("[OK]\nUnpacking start-translator.sh ...");
-                unpackAsset("start-translator.sh");
-                printText("[OK]\nUnpacking tracker ...");
-                unpackAsset("tracker");
-                printText("[OK]\nUnpacking qemu-i386-static ...");
-                printText("[OK]\nSetting permissions.\n");
-                Runtime.getRuntime().exec("chmod 777 " + DedicatedActivity.filesDir + "/xash " + DedicatedActivity.filesDir + "/xash_sse2 " + DedicatedActivity.filesDir + "/tracker " + DedicatedActivity.filesDir + "/qemu-i386-static").waitFor();
-            }
-        } catch (Exception e) {}
-    }
-
     public void printText(String text)
     {
         updateNotification(text);
     }
-
-    public void unpackAsset(String name) throws Exception
-    {
-        AssetManager assetManager = getApplicationContext().getAssets();
-        byte[] buffer = new byte[1024];
-        int read;
-        InputStream in = assetManager.open(name);
-        OutputStream out = new FileOutputStream(DedicatedActivity.filesDir + "/" + name );
-        while((read = in.read(buffer)) != -1){
-            out.write(buffer, 0, read);
-        }
-        out.close();
-        in.close();
-    }
-
+	
     public void startAction()
     {
         try
