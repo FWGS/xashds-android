@@ -67,11 +67,15 @@ public class ListActivity extends Activity {
         layout.addView(header);
 		
         File dir;
+		
+		String game = CommandParser.parseSingleParameter(DedicatedActivity.argsString, "-game");
+		if (game.equals("")) game = "valve";
+		
 		if (isGameSelector) {
 			filePath = DedicatedActivity.gamePath;
 			relativePath = "";
 		} else {
-			filePath = makeDir(DedicatedActivity.gamePath, CommandParser.parseSingleParameter(DedicatedActivity.argsString, "-game"), folder);
+			filePath = makeDir(DedicatedActivity.gamePath, game, folder);
 			relativePath = folder + "/";
 			}
 		dir = new File(filePath);
