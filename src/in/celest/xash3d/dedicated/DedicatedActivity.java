@@ -180,7 +180,7 @@ public class DedicatedActivity extends Activity {
 		SharedPreferences.Editor editor = mPref.edit();
 		editor.putString("argv", argsString);
 		editor.putString("basedir", gamePath);
-		editor.putInt("translator", translatorSelector.getSelectedItemPosition());
+		if (translatorSelector != null) editor.putInt("translator", translatorSelector.getSelectedItemPosition());
 		try {
 			editor.putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
 		} catch (Exception e) {}
