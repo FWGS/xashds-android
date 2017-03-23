@@ -134,8 +134,6 @@ public class ListActivity extends Activity {
 				result = filename.subSequence(0, filename.lastIndexOf(".")).toString();
 			}
 			else result = relativePath+filename;
-			//Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
-			//return filename
 			makeResult(result);
 		}
 	}

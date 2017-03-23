@@ -41,6 +41,8 @@ public class DedicatedService extends Service {
     static String baseDir;
     static String cmdArgs;
 
+    private int iconRes;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -53,6 +55,8 @@ public class DedicatedService extends Service {
         translator = DedicatedActivity.translator;
         baseDir = DedicatedActivity.gamePath;
 		cmdArgs = DedicatedActivity.argsString;
+
+        iconRes = R.drawable.logo_wait;
 
         isStarted = true;
         game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
@@ -69,7 +73,7 @@ public class DedicatedService extends Service {
 	public void updateNotification(String str) 
 	{
 		Notification.Builder builder = new Notification.Builder(this)
-			.setSmallIcon(R.drawable.logo).setContentTitle("XashDS: "+game).setContentText(str);
+			.setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
 		builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(getApplicationContext(), DedicatedActivity.class), 0));
         serverNotify = builder.build();
 
