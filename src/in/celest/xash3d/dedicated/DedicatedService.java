@@ -72,6 +72,14 @@ public class DedicatedService extends Service {
 	
 	public void updateNotification(String str) 
 	{
+		if (process != null)
+			if (isRunning()) {
+				if (str.lastIndexOf("player server started") != -1) iconRes = R.drawable.logo_ok;
+				if (str.lastIndexOf("SV_Shutdown") != -1) iconRes = R.drawable.logo_wait;
+			} else {
+				iconRes = R.drawable.logo_error;
+			}
+		
 		Notification.Builder builder = new Notification.Builder(this)
 			.setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
 		builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(getApplicationContext(), DedicatedActivity.class), 0));
@@ -195,4 +203,13 @@ public class DedicatedService extends Service {
             printText(e.toString()+"\n");
         }
     }
+	
+	boolean isRunning() {
+		try {
+			process.exitValue();
+			return false;
+		} catch (Exception e) {
+			return true;
+		}
+	}
 }
