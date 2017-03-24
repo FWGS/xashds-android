@@ -12,6 +12,7 @@
 	<string name="b_sd">Enable external SD RW!</string>
 	
 	<string name="b_master">Server master</string>
+	<string name="b_master_close">Close master</string>
 	
 	<string name="b_close">Close</string>
 	

@@ -57,7 +57,7 @@ public class DedicatedService extends Service {
 		cmdArgs = DedicatedActivity.argsString;
 
         iconRes = R.drawable.logo_wait;
-
+		
         isStarted = true;
         game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
         if (game == "") game = "hl";
@@ -204,7 +204,7 @@ public class DedicatedService extends Service {
         }
     }
 	
-	boolean isRunning() {
+	public static boolean isRunning() {
 		try {
 			process.exitValue();
 			return false;

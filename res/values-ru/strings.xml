@@ -12,6 +12,7 @@
 	<string name="b_sd">Разрешить RW для внешней SD!</string>
 	
 	<string name="b_master">Настройщик сервера</string>
+	<string name="b_master_close">Закрыть настройщик</string>
 
 	<string name="b_close">Закрыть</string>
 

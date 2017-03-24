@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import android.os.Environment;
 import java.util.*;
 import android.view.View.*;
+import android.graphics.*;
 
 public class DedicatedActivity extends Activity {
 	//views for launcher screen
@@ -54,6 +55,7 @@ public class DedicatedActivity extends Activity {
 	static EditText serverDlls;
 	static EditText serverMap;
 	static EditText rconPass;
+	static Button 	launchXash;
 	static Switch devBox;
 	static Switch conoleBox;
 	static Switch logBox;
@@ -72,6 +74,9 @@ public class DedicatedActivity extends Activity {
 	static LayoutParams buttonParams;
 
 	static boolean isRunned = false;
+	static boolean tab = true;
+	
+	private MenuItem launcherItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -86,7 +91,8 @@ public class DedicatedActivity extends Activity {
 		if (DedicatedStatics.launched != null) DedicatedStatics.launched.finish();
 		DedicatedStatics.launched = this;
 		
-		initLauncher();
+		if (tab) initLauncher();
+			else initMaster();
 	}
 
     private String[] listTranslators()
@@ -125,6 +131,7 @@ public class DedicatedActivity extends Activity {
 		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		if(output.getChildCount() > 1024)
 			output.removeViewAt(0);
+			
 		output.addView(line);
 		if( !isScrolling )
 		scroll.postDelayed(new Runnable() {
@@ -138,7 +145,7 @@ public class DedicatedActivity extends Activity {
 		isScrolling = true;
 		//croll.fullScroll(ScrollView.FOCUS_DOWN);
 	}
-
+	
 	public void printLog(String strin)
 	{
 		class OutputCallback implements Runnable {
@@ -191,6 +198,7 @@ public class DedicatedActivity extends Activity {
 
 	private void initLauncher()
 	{
+		tab = true;
 		setTitle(R.string.launcher_head);
 
 		filesDir = getApplicationContext().getFilesDir().getPath();
@@ -217,8 +225,10 @@ public class DedicatedActivity extends Activity {
 		
 		cmdArgs = new EditText(this);
 		cmdArgs.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		cmdArgs.setSingleLine();
 		baseDir = new EditText(this);
 		baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		baseDir.setSingleLine();
 
 		LinearLayout button_bar = new LinearLayout(this);
 		button_bar.setOrientation(LinearLayout.HORIZONTAL);
@@ -241,20 +251,8 @@ public class DedicatedActivity extends Activity {
 			}
 		});
 		externalPicker.setEnabled(false);
-
-		Button launch_master = new Button(this);
-		launch_master.setText(R.string.b_master);
-		launch_master.setLayoutParams(buttonParams);
-		launch_master.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				pushLauncherSettings();
-				saveSettings();
-				initMaster();
-			}
-		});
 		
-		Button launchXash = new Button(this);
+		launchXash = new Button(this);
 		launchXash.setText(R.string.b_start_xash);
 		launchXash.setLayoutParams(buttonParams);
 		launchXash.setOnClickListener(new View.OnClickListener() {
@@ -263,7 +261,7 @@ public class DedicatedActivity extends Activity {
 					startXash();
 				}
 			});
-
+			
 		// Set launch button title here
 		startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 		startButton.setLayoutParams(buttonParams);
@@ -285,7 +283,6 @@ public class DedicatedActivity extends Activity {
 		});
 		launcher.addView(titleView);
 		launcher.addView(cmdArgs);
-		launcher.addView(launch_master);
 		launcher.addView(titleView2);
 		launcher.addView(baseDir);
 		// Add other options here
@@ -333,6 +330,7 @@ public class DedicatedActivity extends Activity {
 	}
 
 	void initMaster() {
+		tab = false;
 		setTitle(R.string.master_head);
 
 		ScrollView masterScroll = new ScrollView(this);
@@ -444,7 +442,13 @@ public class DedicatedActivity extends Activity {
 		b.setOnClickListener(new ListViewOpener(dir));
 		return b;
 	}
-	
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		menu.add(Menu.NONE, 1, Menu.NONE, R.string.b_master);
+		return super.onCreateOptionsMenu(menu);
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
@@ -452,6 +456,14 @@ public class DedicatedActivity extends Activity {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				initLauncher();
+				launcherItem.setTitle(R.string.b_master);
+				return true;
+			case 1:
+				launcherItem = item;
+				if (tab) initMaster();
+					else initLauncher();
+				if (tab) item.setTitle(R.string.b_master);
+					else item.setTitle(R.string.b_master_close);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -557,7 +569,7 @@ public class DedicatedActivity extends Activity {
 			saveSettings();
 			Intent newi = new Intent(DedicatedActivity.this, ListActivity.class);
 			newi.putExtra("folder", folder);
-			startActivityForResult(newi, 42);
+			startActivityForResult(newi, 1998);
 		}
 	}
 
@@ -566,7 +578,7 @@ public class DedicatedActivity extends Activity {
 	{
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		if (resultCode == RESULT_OK) {
+		if (requestCode == 1998) if (resultCode == RESULT_OK) {
 			String result = data.getStringExtra("result");
 			final String folder = data.getStringExtra("folder");
 			printText("Returned result: "+result);
