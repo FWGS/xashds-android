@@ -261,6 +261,7 @@ public class DedicatedActivity extends Activity {
 					startXash();
 				}
 			});
+		launchXash.setEnabled(DedicatedService.canConnect);
 			
 		// Set launch button title here
 		startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
@@ -634,5 +635,17 @@ public class DedicatedActivity extends Activity {
 		}
 		out.close(); 
 		in.close();
+	}
+	
+	public void setCanConnect(final boolean can)
+	{
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				launchXash.setEnabled(can);
+			}
+		});
 	}
 }

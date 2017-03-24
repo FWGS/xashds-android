@@ -42,6 +42,8 @@ public class DedicatedService extends Service {
     static String cmdArgs;
 
     private int iconRes;
+	
+	public static boolean canConnect = false;
 
     @Override
     public void onCreate() {
@@ -74,12 +76,19 @@ public class DedicatedService extends Service {
 	{
 		if (process != null)
 			if (isRunning()) {
-				if (str.lastIndexOf("player server started") != -1) iconRes = R.drawable.logo_ok;
-				if (str.lastIndexOf("SV_Shutdown") != -1) iconRes = R.drawable.logo_wait;
+				if (str.lastIndexOf("player server started") != -1) {
+					iconRes = R.drawable.logo_ok;
+					canConnect = true;
+					}
+				if (str.lastIndexOf("SV_Shutdown") != -1) {
+					iconRes = R.drawable.logo_wait;
+					canConnect = false;
+					}
 			} else {
 				iconRes = R.drawable.logo_error;
+				canConnect = false;
 			}
-		
+			
 		Notification.Builder builder = new Notification.Builder(this)
 			.setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
 		builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(getApplicationContext(), DedicatedActivity.class), 0));
@@ -87,7 +96,10 @@ public class DedicatedService extends Service {
 
         startForeground(777, serverNotify);
 		
-		if (DedicatedStatics.launched != null) DedicatedStatics.launched.printLog(str);
+		if (DedicatedStatics.launched != null) { 
+			DedicatedStatics.launched.printLog(str);
+			DedicatedStatics.launched.setCanConnect(canConnect);
+			}
 		
 		DedicatedStatics.logView.add(str);
 		if (DedicatedStatics.logView.size() >= 1023) DedicatedStatics.logView.remove(0);
@@ -98,6 +110,8 @@ public class DedicatedService extends Service {
         super.onDestroy();
         startAction();
         isStarted = false;
+		canConnect = false;
+		if (DedicatedStatics.launched != null) DedicatedStatics.launched.setCanConnect(canConnect);
 		printText("Service destroyed.");
 	}
 
