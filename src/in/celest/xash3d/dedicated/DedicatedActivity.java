@@ -258,6 +258,7 @@ public class DedicatedActivity extends Activity {
 		launchXash.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					DedicatedStatics.launched = DedicatedActivity.this;
 					startXash();
 				}
 			});
@@ -482,7 +483,7 @@ public class DedicatedActivity extends Activity {
 		if (!serverMap.getText().toString().equals("")) ret += CommandParser.makeParamArgString(serverMap.getText().toString(), "+map");
 		if (!rconPass.getText().toString().equals("")) ret += CommandParser.makeParamArgString(rconPass.getText().toString(), "+rcon_password");
 		if (deathmatchSwitch.isChecked()) ret += "+deathmatch 1 ";
-		else ret += "+coop 1 ";
+			else ret += "+coop 1 ";
 		return ret;
 	}
 	
@@ -501,33 +502,31 @@ public class DedicatedActivity extends Activity {
 
 	public void startServer()
 	{
-		File f = new File(filesDir+"/xash");
 		try 
 		{
-
-		if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
-		{
-			//Unpack files now
-			printText("Unpacking xash... ");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("xash");
-			printText("[OK]\nUnpacking xash_sse2 ...");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("xash_sse2");
-			printText("[OK]\nUnpacking start-translator.sh ...");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("start-translator.sh");
-			printText("[OK]\nUnpacking tracker ...");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("tracker");
-			printText("[OK]\nUnpacking qemu-i386-static ...");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("qemu-i386-static");
-			printText("[OK]\nSetting permissions.\n");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
-		}
+			/*first of all, we should unpack executables if they're not unpacked
+			i don't know why, but we can't do it in DedicatedService - permossions there aren't setting
+			so we can't run server*/
+			File f = new File(filesDir+"/xash");
+			if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
+			{
+				//Unpack files now
+				printText("Unpacking xash... ");
+				unpackAsset("xash");
+				printText("[OK]\nUnpacking xash_sse2 ...");
+				unpackAsset("xash_sse2");
+				printText("[OK]\nUnpacking start-translator.sh ...");
+				unpackAsset("start-translator.sh");
+				printText("[OK]\nUnpacking tracker ...");
+				unpackAsset("tracker");
+				printText("[OK]\nUnpacking qemu-i386-static ...");
+				unpackAsset("qemu-i386-static");
+				printText("[OK]\nSetting permissions.\n");
+				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
+			}
 		} catch (Exception e) {}
+		//so, as executables are unpacked, we can start service
+		//server launch takes place in DedicatedService
 		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
 		dedicatedServer.putExtra("argv", argsString);
 		dedicatedServer.putExtra("path", gamePath);
@@ -553,9 +552,16 @@ public class DedicatedActivity extends Activity {
 		saveSettings();
 		super.onPause();
 	}
+
+	@Override
+	protected void onResume()
+	{
+		DedicatedStatics.launched = this;
+		super.onResume();
+	}
 	
 	public class ListViewOpener implements View.OnClickListener
-	{
+	{//open folder selector button listener
 		String folder;
 		
 		ListViewOpener(String f)
@@ -565,7 +571,7 @@ public class DedicatedActivity extends Activity {
 
 		@Override
 		public void onClick(View p1)
-		{
+		{//show folder selector
 			pushMasterSettings();
 			saveSettings();
 			Intent newi = new Intent(DedicatedActivity.this, ListActivity.class);
@@ -579,22 +585,29 @@ public class DedicatedActivity extends Activity {
 	{
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		if (requestCode == 1998) if (resultCode == RESULT_OK) {
-			String result = data.getStringExtra("result");
-			final String folder = data.getStringExtra("folder");
+		//on file selected in master
+		if (requestCode == 1998) 
+			if (resultCode == RESULT_OK) {
+			String result = data.getStringExtra("result"); //seleced file/folder
+			final String folder = data.getStringExtra("folder"); //parent folder
 			printText("Returned result: "+result);
 			
 			switch (folder) {
 				case "dlls":
+				//is it a server dll?
 				if (serverDlls.getText().toString().lastIndexOf(result) == -1) 
 					if (serverDlls.getText().toString().equals("")) serverDlls.append(result);
 						else serverDlls.append(", "+result);
 				break;
 				case "maps":
+				//or a map?
 				serverMap.setText(result);
 				break;
 				case "":
+				//or a game/mod folder name?
 				if (!modDir.getText().toString().equals(result)) {
+					//if game has changed, then selected for previous one
+					//maps and dlls are no more needed
 					serverDlls.setText("");
 					serverMap.setText("");
 				}
@@ -608,13 +621,13 @@ public class DedicatedActivity extends Activity {
 	}
 	
 	public void startXash()
-    {
+	{//show connect mode selector
 		Intent intent = new Intent(this, ConnectActivity.class);
 		startActivity(intent);
     }
 
     public boolean isXashInstalled()
-	{
+	{//check if xash3d is installed to play
 		try
 		{
 			getPackageManager().getPackageInfo("in.celest.xash3d.hl", PackageManager.GET_ACTIVITIES);
@@ -625,6 +638,7 @@ public class DedicatedActivity extends Activity {
 	}
 	
 	public void unpackAsset(String name) throws Exception {
+		//unpack executable
 		AssetManager assetManager = getApplicationContext().getAssets();
 		byte[] buffer = new byte[1024];
 		int read;
@@ -637,8 +651,8 @@ public class DedicatedActivity extends Activity {
 		in.close();
 	}
 	
-	public void setCanConnect(final boolean can)
-	{
+	public void setCanConnect(final boolean can) 
+	{//setting if "Connect" button is enabled
 		runOnUiThread(new Runnable()
 		{
 			@Override

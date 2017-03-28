@@ -93,7 +93,7 @@ public class DedicatedService extends Service {
 			.setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
 		builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(getApplicationContext(), DedicatedActivity.class), 0));
         serverNotify = builder.build();
-
+		
         startForeground(777, serverNotify);
 		
 		if (DedicatedStatics.launched != null) { 
