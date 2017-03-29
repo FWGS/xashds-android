@@ -448,6 +448,7 @@ public class DedicatedActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(Menu.NONE, 1, Menu.NONE, R.string.b_master);
+		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_refresh_cache);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -465,6 +466,9 @@ public class DedicatedActivity extends Activity {
 					else initLauncher();
 				if (tab) item.setTitle(R.string.b_master);
 					else item.setTitle(R.string.b_master_close);
+				return true;
+			case 2:
+				refreshCache();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -501,33 +505,7 @@ public class DedicatedActivity extends Activity {
 
 	public void startServer()
 	{
-		File f = new File(filesDir+"/xash");
-		try 
-		{
-
-		if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
-		{
-			//Unpack files now
-			printText("Unpacking xash... ");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("xash");
-			printText("[OK]\nUnpacking xash_sse2 ...");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("xash_sse2");
-			printText("[OK]\nUnpacking start-translator.sh ...");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("start-translator.sh");
-			printText("[OK]\nUnpacking tracker ...");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("tracker");
-			printText("[OK]\nUnpacking qemu-i386-static ...");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			unpackAsset("qemu-i386-static");
-			printText("[OK]\nSetting permissions.\n");
-			//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-			Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
-		}
-		} catch (Exception e) {}
+		unpackAssets();
 		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
 		dedicatedServer.putExtra("argv", argsString);
 		dedicatedServer.putExtra("path", gamePath);
@@ -637,6 +615,37 @@ public class DedicatedActivity extends Activity {
 		in.close();
 	}
 	
+	public void unpackAssets()
+	{
+		File f = new File(filesDir+"/xash");
+		try 
+		{
+
+			if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
+			{
+				//Unpack files now
+				printText("Unpacking xash... ");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("xash");
+				printText("[OK]\nUnpacking xash_sse2 ...");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("xash_sse2");
+				printText("[OK]\nUnpacking start-translator.sh ...");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("start-translator.sh");
+				printText("[OK]\nUnpacking tracker ...");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("tracker");
+				printText("[OK]\nUnpacking qemu-i386-static ...");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("qemu-i386-static");
+				printText("[OK]\nSetting permissions.\n");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
+			}
+		} catch (Exception e) {}
+	}
+	
 	public void setCanConnect(final boolean can)
 	{
 		runOnUiThread(new Runnable()
@@ -647,5 +656,17 @@ public class DedicatedActivity extends Activity {
 				launchXash.setEnabled(can);
 			}
 		});
+	}
+	
+	public void refreshCache()
+	{
+		File dir = new File(filesDir);
+		File[] oldAssets = dir.listFiles();
+		
+		printText("\nRefreshing...");
+		if (oldAssets != null) for (File f : oldAssets) 
+			if (f.delete()) printText("Successfuly removed "+f.getName());
+		printText("");
+		unpackAssets();
 	}
 }

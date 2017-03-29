@@ -13,6 +13,8 @@
 	
 	<string name="b_master">Настройщик сервера</string>
 	<string name="b_master_close">Закрыть настройщик</string>
+	
+	<string name="b_refresh_cache">Обновить файлы</string>
 
 	<string name="b_close">Закрыть</string>
 
