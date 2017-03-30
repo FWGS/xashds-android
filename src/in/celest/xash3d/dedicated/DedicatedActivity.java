@@ -639,9 +639,11 @@ public class DedicatedActivity extends Activity {
 				printText("[OK]\nUnpacking qemu-i386-static ...");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 				unpackAsset("qemu-i386-static");
+				
+				unpackAsset("xash-old");
 				printText("[OK]\nSetting permissions.\n");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
+				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static "+filesDir+"/xash-old").waitFor();
 			}
 		} catch (Exception e) {}
 	}

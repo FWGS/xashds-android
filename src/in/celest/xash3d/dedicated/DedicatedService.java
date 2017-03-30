@@ -146,6 +146,7 @@ public class DedicatedService extends Service {
             }
             else
             if(translator == "qemu")
+				//process = Runtime.getRuntime().exec(filesDir+"/xash-old " + cmdArgs);
                 process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir +" "+ filesDir +"/xash " + cmdArgs);
             else
                 process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-translator.sh " + filesDir + " " + translator + " " + baseDir + " " + cmdArgs);
@@ -162,9 +163,14 @@ public class DedicatedService extends Service {
 
                         BufferedReader reader = new BufferedReader(
                                 new InputStreamReader(process.getInputStream()));
+						BufferedReader errorReader = new BufferedReader(
+								new InputStreamReader(process.getErrorStream()));
                         String str = null;
-                        while ((str = reader.readLine()) != null) {
-                            printText(str);
+						String errstr = null;
+                        while (((str = reader.readLine()) != null) || 
+								((errstr = errorReader.readLine()) != null)) {
+                            if (str != null) printText(str);
+							if (errstr != null) printText(errstr);
 							}
                         reader.close();
 
