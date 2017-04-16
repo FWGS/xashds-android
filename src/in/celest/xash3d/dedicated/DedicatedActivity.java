@@ -60,6 +60,7 @@ public class DedicatedActivity extends Activity {
 	static Switch conoleBox;
 	static Switch logBox;
 	static Switch deathmatchSwitch;
+	static Switch lanSwitch;
 	static SharedPreferences mPref;
 	static Process process = null;
 	static String filesDir;
@@ -70,12 +71,12 @@ public class DedicatedActivity extends Activity {
 	static String gamePath;
 
 	static boolean isDev = false;
-	
+
 	static LayoutParams buttonParams;
 
 	static boolean isRunned = false;
 	static boolean tab = true;
-	
+
 	private MenuItem launcherItem;
 
     @Override
@@ -87,12 +88,12 @@ public class DedicatedActivity extends Activity {
 		buttonParams.gravity = 5;
 
 		isRunned = DedicatedService.isStarted;
-		
+
 		if (DedicatedStatics.launched != null) DedicatedStatics.launched.finish();
 		DedicatedStatics.launched = this;
-		
+
 		if (tab) initLauncher();
-			else initMaster();
+		else initMaster();
 	}
 
     private String[] listTranslators()
@@ -105,7 +106,7 @@ public class DedicatedActivity extends Activity {
 				"com.eltechs.doombyeltechs",
 				"com.eltechs.hereticbyeltechs",
 				"ru.buka.petka1"
-				};
+			};
 			List<String> list2 = new ArrayList<String>();
 			list2.add("qemu");
 			for(String s : list)
@@ -114,7 +115,7 @@ public class DedicatedActivity extends Activity {
 				if(f.exists())
 					list2.add(s);
 			}
-			
+
 			return list2.toArray(new String[list2.size()]);
 		}
 		catch(Exception e)
@@ -131,21 +132,21 @@ public class DedicatedActivity extends Activity {
 		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		if(output.getChildCount() > 1024)
 			output.removeViewAt(0);
-			
+
 		output.addView(line);
 		if( !isScrolling )
-		scroll.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				scroll.fullScroll(ScrollView.FOCUS_DOWN);
-				isScrolling = false;
-			}
-		}, 200);
-		
+			scroll.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						scroll.fullScroll(ScrollView.FOCUS_DOWN);
+						isScrolling = false;
+					}
+				}, 200);
+
 		isScrolling = true;
 		//croll.fullScroll(ScrollView.FOCUS_DOWN);
 	}
-	
+
 	public void printLog(String strin)
 	{
 		class OutputCallback implements Runnable {
@@ -155,10 +156,10 @@ public class DedicatedActivity extends Activity {
 				printText(str);
 			}
 		}
-		
+
 		runOnUiThread(new OutputCallback(strin));
 	}
-	
+
 	private void loadSettings()
 	{
 		mPref = getSharedPreferences("dedicated", 0);
@@ -169,19 +170,19 @@ public class DedicatedActivity extends Activity {
 		if (translatorSelector != null)
 			if (mPref.getInt("translator", 0) < translatorSelector.getCount()) translatorSelector.setSelection(mPref.getInt("translator", 1));
 	}
-	
+
 	private void pushLauncherSettings() 
 	{
 		argsString = cmdArgs.getText().toString();
 		gamePath = baseDir.getText().toString();
 	}
-	
+
 	private void pushMasterSettings()
 	{
 
 		argsString = makeMasterArgs();
 	}
-	
+
 	private void saveSettings() 
 	{
 		SharedPreferences.Editor editor = mPref.edit();
@@ -217,18 +218,19 @@ public class DedicatedActivity extends Activity {
 		output = new LinearLayout(this);
 		output.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		output.setOrientation(LinearLayout.VERTICAL);
-		
+
 		for (int i = 0; i < DedicatedStatics.logView.size(); i++)
 		{
 			printText(DedicatedStatics.logView.get(i));
 		}
-		
+
 		cmdArgs = new EditText(this);
 		cmdArgs.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		cmdArgs.setSingleLine();
 		baseDir = new EditText(this);
 		baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		baseDir.setSingleLine();
+
 
 		LinearLayout button_bar = new LinearLayout(this);
 		button_bar.setOrientation(LinearLayout.HORIZONTAL);
@@ -240,49 +242,48 @@ public class DedicatedActivity extends Activity {
 		externalPicker.setText(R.string.b_sd);
 		externalPicker.setLayoutParams(buttonParams);
 		externalPicker.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				printText("Trying to access...");
+				@Override
+				public void onClick(View v) {
+					printText("Trying to access...");
 
-				Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-				startActivityForResult(intent, 42);
-				
-				initLauncher();
-			}
-		});
+					Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+					startActivityForResult(intent, 42);
+
+					initLauncher();
+				}
+			});
 		externalPicker.setEnabled(false);
-		
+
 		launchXash = new Button(this);
 		launchXash.setText(R.string.b_start_xash);
 		launchXash.setLayoutParams(buttonParams);
 		launchXash.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					DedicatedStatics.launched = DedicatedActivity.this;
 					startXash();
 				}
 			});
 		launchXash.setEnabled(DedicatedService.canConnect);
-			
+
 		// Set launch button title here
 		startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 		startButton.setLayoutParams(buttonParams);
 		startButton.setOnClickListener( new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				isRunned = !isRunned;
-				startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
+				@Override
+				public void onClick(View v) {
+					isRunned = !isRunned;
+					startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 
-				pushLauncherSettings();
-				saveSettings();
-					
-				if (isRunned) {
-					startServer();
-				} else {
-					stopServer();
+					pushLauncherSettings();
+					saveSettings();
+
+					if (isRunned) {
+						startServer();
+					} else {
+						stopServer();
+					}
 				}
-			}
-		});
+			});
 		launcher.addView(titleView);
 		launcher.addView(cmdArgs);
 		launcher.addView(titleView2);
@@ -296,29 +297,29 @@ public class DedicatedActivity extends Activity {
 			if(list.length > 1)
 			{
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-						android.R.layout.simple_spinner_dropdown_item, list);
+																		android.R.layout.simple_spinner_dropdown_item, list);
 				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 				translatorSelector = new Spinner(this);
 				translatorSelector.setAdapter(adapter);
 				translatorSelector.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 				translatorSelector.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
-					@Override
-					public void onItemSelected(AdapterView<?> parent, View view,
-											   int pos, long id) {
-						translator = list[pos];
-					}
-					@Override
-					public void onNothingSelected(AdapterView<?> parent) {
-						translator = "qemu";
-					}
+						@Override
+						public void onItemSelected(AdapterView<?> parent, View view,
+												   int pos, long id) {
+							translator = list[pos];
+						}
+						@Override
+						public void onNothingSelected(AdapterView<?> parent) {
+							translator = "qemu";
+						}
 
-				});
+					});
 				launcher.addView(translatorSelector);
 			}
 		}
 		button_bar.addView(startButton);
 		//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  //SD card pick API enabled on 5.0(v21) and higher
-			//button_bar.addView(externalPicker);
+		//button_bar.addView(externalPicker);
 		if (isXashInstalled()) button_bar.addView(launchXash);
 		launcher.addView(button_bar);
 		scroll.addView(output);
@@ -327,7 +328,7 @@ public class DedicatedActivity extends Activity {
 		loadSettings();
 
 		setContentView(launcher);
-		
+
 		getActionBar().setDisplayHomeAsUpEnabled(false);
 	}
 
@@ -336,11 +337,11 @@ public class DedicatedActivity extends Activity {
 		setTitle(R.string.master_head);
 
 		ScrollView masterScroll = new ScrollView(this);
-		
+
 		LinearLayout master = new LinearLayout(this);
 		master.setOrientation(LinearLayout.VERTICAL);
 		master.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		
+
 		TextView gameNameView = new TextView(this);
 		gameNameView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		gameNameView.setText(R.string.l_game);
@@ -350,7 +351,7 @@ public class DedicatedActivity extends Activity {
 		gameDllsView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		gameDllsView.setText(R.string.l_dlls);
 		gameDllsView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
-		
+
 		TextView gameMapView = new TextView(this);
 		gameMapView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		gameMapView.setText(R.string.l_map);
@@ -360,18 +361,42 @@ public class DedicatedActivity extends Activity {
 		serverPassView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		serverPassView.setText(R.string.l_rcon);
 		serverPassView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
-		
+
 		modDir = new EditText(this);
 		modDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		modDir.setHint(R.string.h_game);
+		modDir.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v)
+			{
+				modDir.setText("");
+				return true;
+			}
+		});
 
 		serverDlls = new EditText(this);
 		serverDlls.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		serverDlls.setHint(R.string.h_dlls);
-		
+		serverDlls.setOnLongClickListener(new View.OnLongClickListener() {
+				@Override
+				public boolean onLongClick(View v)
+				{
+					serverDlls.setText("");
+					return true;
+				}
+			});
+
 		serverMap = new EditText(this);
 		serverMap.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		serverMap.setHint(R.string.h_map);
+		serverMap.setOnLongClickListener(new View.OnLongClickListener() {
+				@Override
+				public boolean onLongClick(View v)
+				{
+					serverMap.setText("");
+					return true;
+				}
+			});
 		
 		rconPass = new EditText(this);
 		rconPass.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
@@ -392,26 +417,35 @@ public class DedicatedActivity extends Activity {
 		deathmatchSwitch = new Switch(this);
 		deathmatchSwitch.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		deathmatchSwitch.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				deathmatchSwitch.setText(deathmatchSwitch.isChecked()?R.string.v_isdm:R.string.v_iscoop);
-			}
-		});
-		
+				@Override
+				public void onClick(View v) {
+					deathmatchSwitch.setText(deathmatchSwitch.isChecked()?R.string.v_isdm:R.string.v_iscoop);
+				}
+			});
+			
+		lanSwitch = new Switch(this);
+		lanSwitch.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		lanSwitch.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					lanSwitch.setText(lanSwitch.isChecked()?R.string.v_ispublic:R.string.v_islan);
+				}
+			});
+
 		Button saveButton = new Button(this);
 		saveButton.setLayoutParams(buttonParams);
 		saveButton.setText(R.string.l_save);
 		saveButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				pushMasterSettings();
-				saveSettings();
-			}
-		});
-		
+				@Override
+				public void onClick(View v) {
+					pushMasterSettings();
+					saveSettings();
+				}
+			});
+
 		masterScroll.addView(master);
-		
-		master.addView(saveButton);
+
+		//master.addView(saveButton);
 		master.addView(gameNameView);
 		master.addView(modDir);
 		master.addView(makeListButton("", R.string.b_select));
@@ -427,15 +461,16 @@ public class DedicatedActivity extends Activity {
 		master.addView(conoleBox);
 		master.addView(logBox);
 		master.addView(deathmatchSwitch);
+		master.addView(lanSwitch);
 
 		loadSettings();
 		parseArgsToMaster(argsString);
 
 		setContentView(masterScroll); //let us see that Master-Scroll!
-		
+
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
-	
+
 	private Button makeListButton(String dir, int txtResId)
 	{
 		Button b = new Button(this);
@@ -449,6 +484,7 @@ public class DedicatedActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(Menu.NONE, 1, Menu.NONE, R.string.b_master);
+		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_refresh_cache);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -457,21 +493,31 @@ public class DedicatedActivity extends Activity {
 	{
 		switch (item.getItemId()) {
 			case android.R.id.home:
+				if (tab) pushLauncherSettings();
+					else pushMasterSettings();
+				saveSettings();
 				initLauncher();
 				launcherItem.setTitle(R.string.b_master);
 				return true;
 			case 1:
+				if (tab) pushLauncherSettings();
+					else pushMasterSettings();
+				saveSettings();
 				launcherItem = item;
 				if (tab) initMaster();
-					else initLauncher();
+				else initLauncher();
 				if (tab) item.setTitle(R.string.b_master);
-					else item.setTitle(R.string.b_master_close);
+				else item.setTitle(R.string.b_master_close);
+				return true;
+			case 2:
+				saveSettings();
+				refreshCache();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	public String makeMasterArgs() 
 	{
 		String ret = "";
@@ -484,9 +530,10 @@ public class DedicatedActivity extends Activity {
 		if (!rconPass.getText().toString().equals("")) ret += CommandParser.makeParamArgString(rconPass.getText().toString(), "+rcon_password");
 		if (deathmatchSwitch.isChecked()) ret += "+deathmatch 1 ";
 			else ret += "+coop 1 ";
+		if (lanSwitch.isChecked()) ret += "+public 1";
 		return ret;
 	}
-	
+
 	public void parseArgsToMaster(String args) {
 		modDir.setText(CommandParser.parseSingleParameter(args, "-game"));
 		serverDlls.setText(CommandParser.parseMultipleParameter(args, "-dll"));
@@ -497,36 +544,14 @@ public class DedicatedActivity extends Activity {
 		logBox.setChecked(CommandParser.parseLogicParameter(args, "-log"));
 		if (CommandParser.parseSingleParameter(args, "+deathmatch").equals("1")) deathmatchSwitch.setChecked(true);
 		if (CommandParser.parseSingleParameter(args, "+coop").equals("1")) deathmatchSwitch.setChecked(false);
+		if (CommandParser.parseSingleParameter(args, "+public").equals("1")) lanSwitch.setChecked(true);
 		deathmatchSwitch.setText(deathmatchSwitch.isChecked()?R.string.v_isdm:R.string.v_iscoop);
+		lanSwitch.setText(lanSwitch.isChecked()?R.string.v_ispublic:R.string.v_islan);
 	}
 
 	public void startServer()
 	{
-		try 
-		{
-			/*first of all, we should unpack executables if they're not unpacked
-			i don't know why, but we can't do it in DedicatedService - permossions there aren't setting
-			so we can't run server*/
-			File f = new File(filesDir+"/xash");
-			if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
-			{
-				//Unpack files now
-				printText("Unpacking xash... ");
-				unpackAsset("xash");
-				printText("[OK]\nUnpacking xash_sse2 ...");
-				unpackAsset("xash_sse2");
-				printText("[OK]\nUnpacking start-translator.sh ...");
-				unpackAsset("start-translator.sh");
-				printText("[OK]\nUnpacking tracker ...");
-				unpackAsset("tracker");
-				printText("[OK]\nUnpacking qemu-i386-static ...");
-				unpackAsset("qemu-i386-static");
-				printText("[OK]\nSetting permissions.\n");
-				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static").waitFor();
-			}
-		} catch (Exception e) {}
-		//so, as executables are unpacked, we can start service
-		//server launch takes place in DedicatedService
+		unpackAssets();
 		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
 		dedicatedServer.putExtra("argv", argsString);
 		dedicatedServer.putExtra("path", gamePath);
@@ -553,17 +578,10 @@ public class DedicatedActivity extends Activity {
 		super.onPause();
 	}
 
-	@Override
-	protected void onResume()
-	{
-		DedicatedStatics.launched = this;
-		super.onResume();
-	}
-	
 	public class ListViewOpener implements View.OnClickListener
-	{//open folder selector button listener
+	{
 		String folder;
-		
+
 		ListViewOpener(String f)
 		{
 			folder = f;
@@ -571,7 +589,7 @@ public class DedicatedActivity extends Activity {
 
 		@Override
 		public void onClick(View p1)
-		{//show folder selector
+		{
 			pushMasterSettings();
 			saveSettings();
 			Intent newi = new Intent(DedicatedActivity.this, ListActivity.class);
@@ -584,50 +602,43 @@ public class DedicatedActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		super.onActivityResult(requestCode, resultCode, data);
-		
-		//on file selected in master
-		if (requestCode == 1998) 
-			if (resultCode == RESULT_OK) {
-			String result = data.getStringExtra("result"); //seleced file/folder
-			final String folder = data.getStringExtra("folder"); //parent folder
-			printText("Returned result: "+result);
-			
-			switch (folder) {
-				case "dlls":
-				//is it a server dll?
-				if (serverDlls.getText().toString().lastIndexOf(result) == -1) 
-					if (serverDlls.getText().toString().equals("")) serverDlls.append(result);
-						else serverDlls.append(", "+result);
-				break;
-				case "maps":
-				//or a map?
-				serverMap.setText(result);
-				break;
-				case "":
-				//or a game/mod folder name?
-				if (!modDir.getText().toString().equals(result)) {
-					//if game has changed, then selected for previous one
-					//maps and dlls are no more needed
-					serverDlls.setText("");
-					serverMap.setText("");
+
+		if (requestCode == 1998) if (resultCode == RESULT_OK) {
+				String result = data.getStringExtra("result");
+				final String folder = data.getStringExtra("folder");
+				printText("Returned result: "+result);
+
+				switch (folder) {
+					case "dlls":
+						if (serverDlls.getText().toString().lastIndexOf(result) == -1) 
+							if (serverDlls.getText().toString().equals("")) serverDlls.append(result);
+							else serverDlls.append(", "+result);
+						break;
+					case "maps":
+						serverMap.setText(result);
+						break;
+					case "":
+						if (!modDir.getText().toString().equals(result)) {
+							serverDlls.setText("");
+							serverMap.setText("");
+						}
+						modDir.setText((result.equals("valve"))?"":result);
+						break;
 				}
-				modDir.setText((result.equals("valve"))?"":result);
-				break;
+
+				pushMasterSettings();
+				saveSettings();
 			}
-			
-			pushMasterSettings();
-			saveSettings();
-		}
 	}
-	
+
 	public void startXash()
-	{//show connect mode selector
+    {
 		Intent intent = new Intent(this, ConnectActivity.class);
 		startActivity(intent);
     }
 
     public boolean isXashInstalled()
-	{//check if xash3d is installed to play
+	{
 		try
 		{
 			getPackageManager().getPackageInfo("in.celest.xash3d.hl", PackageManager.GET_ACTIVITIES);
@@ -636,9 +647,9 @@ public class DedicatedActivity extends Activity {
 
 		return false;
 	}
-	
+
 	public void unpackAsset(String name) throws Exception {
-		//unpack executable
+		printText("Unpacking "+name+"...");
 		AssetManager assetManager = getApplicationContext().getAssets();
 		byte[] buffer = new byte[1024];
 		int read;
@@ -649,17 +660,57 @@ public class DedicatedActivity extends Activity {
 		}
 		out.close(); 
 		in.close();
+		printText("[OK]\n");
 	}
-	
-	public void setCanConnect(final boolean can) 
-	{//setting if "Connect" button is enabled
-		runOnUiThread(new Runnable()
+
+	public void unpackAssets()
+	{
+		File f = new File(filesDir+"/xash");
+		try 
 		{
-			@Override
-			public void run()
+
+			if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
 			{
-				launchXash.setEnabled(can);
+				//Unpack files now
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("xash");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("xash_sse2");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("start-translator.sh");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("tracker");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				unpackAsset("qemu-i386-static");
+
+				printText("[OK]\nSetting permissions.\n");
+				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static ").waitFor();
 			}
-		});
+		} catch (Exception e) {}
+	}
+
+	public void setCanConnect(final boolean can)
+	{
+		runOnUiThread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					launchXash.setEnabled(can);
+				}
+			});
+	}
+
+	public void refreshCache()
+	{
+		File dir = new File(filesDir);
+		File[] oldAssets = dir.listFiles();
+
+		printText("\nRefreshing...");
+		if (oldAssets != null) for (File f : oldAssets) 
+				if (f.delete()) printText("Successfuly removed "+f.getName());
+		printText("");
+		unpackAssets();
 	}
 }

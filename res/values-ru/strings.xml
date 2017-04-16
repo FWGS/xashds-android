@@ -11,6 +11,8 @@
 	
 	<string name="b_sd">Разрешить RW для внешней SD!</string>
 	
+	<string name="b_refresh_cache">Обновить файлы</string>
+	
 	<string name="b_master">Настройщик сервера</string>
 	<string name="b_master_close">Закрыть настройщик</string>
 
@@ -42,4 +44,6 @@
 	<string name="v_islog">Включить логгирование:</string>
 	<string name="v_isdm">Режим игры: deathmatch</string>
 	<string name="v_iscoop">Режим игры: кооператив</string>
+	<string name="v_ispublic">Сервер в Internet</string>
+	<string name="v_islan">Сервер в LAN</string>
 </resources>

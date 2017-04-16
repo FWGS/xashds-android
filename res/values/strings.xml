@@ -11,6 +11,8 @@
 	
 	<string name="b_sd">Enable external SD RW!</string>
 	
+	<string name="b_refresh_cache">Refresh files</string>
+	
 	<string name="b_master">Server master</string>
 	<string name="b_master_close">Close master</string>
 	
@@ -41,4 +43,6 @@
 	<string name="v_islog">Enable log:</string>
 	<string name="v_isdm">Game mode: deathmatch</string>
 	<string name="v_iscoop">Game mode: coop</string>
+	<string name="v_ispublic">Internet server</string>
+	<string name="v_islan">LAN server</string>
 </resources>
