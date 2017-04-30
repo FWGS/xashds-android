@@ -485,6 +485,7 @@ public class DedicatedActivity extends Activity {
 	{
 		menu.add(Menu.NONE, 1, Menu.NONE, R.string.b_master);
 		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_refresh_cache);
+		menu.add(Menu.NONE, 3, Menu.NONE, R.string.b_about);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -512,6 +513,9 @@ public class DedicatedActivity extends Activity {
 			case 2:
 				saveSettings();
 				refreshCache();
+				return true;
+			case 3:
+				startActivity(new Intent(DedicatedActivity.this, AboutActivity.class));
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
