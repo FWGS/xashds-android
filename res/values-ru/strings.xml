@@ -17,6 +17,8 @@
 	<string name="b_master_close">Закрыть настройщик</string>
 	
 	<string name="b_about">О программе</string>
+
+	<string name="b_scut">Создать ярлык</string>
 	
 	<string name="b_close">Закрыть</string>
 
@@ -36,6 +38,11 @@
 	<string name="l_dlls">Пути к dll\'ям сервера (относительно директории мода)</string>
 	<string name="l_map">Имя стартовой карты</string>
 	<string name="l_rcon">Пароль для удалённого (rcon) контроля</string>
+	
+	<string name="l_scut_name">Название ярлыка: </string>
+	<string name="l_scut_gamel">Запуск игры после загрузки сервера</string>
+	<string name="l_scut_gamem1">Через \"+connect\"</string>
+	<string name="l_scut_gamem2">Через xashds_hacks</string>
 	
 	<string name="h_map">Например: crossfire</string>
 	<string name="h_dlls">Например: dlls/decay.dll</string>

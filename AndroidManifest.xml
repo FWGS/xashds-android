@@ -35,6 +35,11 @@
 			android:exported="true"
 			android:theme="@style/AppDialog"/>
 
+		<activity android:name=".ShortcutCreatorActivity"
+			android:label="Create shortcut..."
+			android:exported="true"
+			android:theme="@style/AppDialog"/>
+		
         <service android:name=".DedicatedService"
             android:exported="false"
             android:enabled="true"/>

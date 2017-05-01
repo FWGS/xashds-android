@@ -77,6 +77,14 @@ public class DedicatedActivity extends Activity {
 
 	static boolean isRunned = false;
 	static boolean tab = true;
+	
+	static boolean 	autostarted;
+	static boolean 	autolaunch;
+	static boolean 	automode;
+	static String 	autoFiles;
+	static String 	autoArgv;
+	static String 	autoGame;
+	static String 	autoTranslator;
 
 	private MenuItem launcherItem;
 
@@ -98,10 +106,18 @@ public class DedicatedActivity extends Activity {
 		
 		if(getIntent().getBooleanExtra("autostart", false))
 		{
-			//do autostart
-			Toast.makeText(this, "Autostarting...", Toast.LENGTH_LONG).show();
+			autostarted = true;
+			autolaunch = getIntent().getBooleanExtra("autolaunch", false);
+			automode = getIntent().getBooleanExtra("automode", false);
 			
-			startServer(getIntent().getStringExtra("game"), getIntent().getStringExtra("files"), getIntent().getStringExtra("argv"), getIntent().getStringExtra("translator"));
+			Toast.makeText(this, autolaunch?"Game will automatically begin after server start":"Autostarting dedicated server...", Toast.LENGTH_LONG).show();
+			
+			autoGame = getIntent().getStringExtra("game");
+			autoFiles = getIntent().getStringExtra("files");
+			autoArgv = getIntent().getStringExtra("argv");
+			autoTranslator = getIntent().getStringExtra("translator");
+			
+			startServer(autoGame, autoFiles, autoArgv, autoTranslator);
 			isRunned = true;
 			startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 		}
@@ -592,6 +608,7 @@ public class DedicatedActivity extends Activity {
 
 	public void stopServer()
 	{
+		autostarted = false;
 		stopService(new Intent(DedicatedActivity.this, DedicatedService.class));
 	}
 
@@ -730,6 +747,38 @@ public class DedicatedActivity extends Activity {
 				public void run()
 				{
 					launchXash.setEnabled(can);
+					if (can&&autolaunch&&autostarted)
+					{
+						autolaunch = false;
+						if (automode)
+						{
+							String arguments = autostarted?autoArgv:argsString;
+
+							String game = CommandParser.parseSingleParameter(arguments, "-game");
+							Intent intent = new Intent();
+							intent.setAction("in.celest.xash3d.START");
+							intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+							intent.putExtra("argv", "-dev 3 +xashds_hacks 1 +rcon_address 127.0.0.1 +rcon_password "+CommandParser.parseSingleParameter(arguments, "+rcon_password"));
+							if (!game.equals("")) intent.putExtra("gamedir", game);
+
+							startActivity(intent);
+						}
+						else
+						{
+							String arguments = autostarted?autoArgv:argsString;
+
+							String game = CommandParser.parseSingleParameter(arguments, "-game");
+							Intent intent = new Intent();
+							intent.setAction("in.celest.xash3d.START");
+							intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+							intent.putExtra("argv", "-dev 3 +connect localhost:27015");
+							if (!game.equals("")) intent.putExtra("gamedir", game);
+
+							startActivity(intent);
+						}
+					}
 				}
 			});
 	}
@@ -748,27 +797,7 @@ public class DedicatedActivity extends Activity {
 	
 	private void createShortcut()
 	{
-		Intent shortcutIntent = new Intent(getApplicationContext(),
-										DedicatedActivity.class);
-		shortcutIntent.setAction(Intent.ACTION_MAIN);
-		
-		shortcutIntent.putExtra("autostart", true);
-		shortcutIntent.putExtra("translator", translator);
-		shortcutIntent.putExtra("files", filesDir);
-		shortcutIntent.putExtra("game", gamePath);
-		shortcutIntent.putExtra("argv", argsString);
-
-		Intent addIntent = new Intent();
-		addIntent
-            .putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-		addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, "Launch server");
-		addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
-						   Intent.ShortcutIconResource.fromContext(getApplicationContext(),
-																   R.drawable.logo));
-
-		addIntent
-            .setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-		addIntent.putExtra("duplicate", true);
-		getApplicationContext().sendBroadcast(addIntent);
+		Intent intent = new Intent(DedicatedActivity.this, ShortcutCreatorActivity.class);
+		startActivity(intent);
 	}
 }

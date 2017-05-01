@@ -40,6 +40,11 @@
 	<string name="l_map">Startup map name</string>
 	<string name="l_rcon">Server control (rcon) password</string>
 	
+	<string name="l_scut_name">Shortcut name: </string>
+	<string name="l_scut_gamel">Launch game after server start</string>
+	<string name="l_scut_gamem1">Via \"+connect\"</string>
+	<string name="l_scut_gamem2">Via xashds_hacks</string>
+	
 	<string name="h_map">For example: crossfire</string>
 	<string name="h_dlls">For example: dlls/decay.dll</string>
 	<string name="h_game">For example: gearbox; decay</string>
