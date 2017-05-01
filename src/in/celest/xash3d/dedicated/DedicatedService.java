@@ -140,12 +140,12 @@ public class DedicatedService extends Service {
             }
             killAll(filesDir+"/qemu-i386-static");
             killAll(filesDir+"/ubt");
-            if(translator == "none")
+            if(translator.equals("none"))
             {
                 process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-x86.sh " + filesDir + " " + baseDir + " " + cmdArgs);
             }
             else
-            if(translator == "qemu")
+            if(translator.equals("qemu"))
                 process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir +" "+ filesDir +"/xash " + cmdArgs);
             else
                 process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-translator.sh " + filesDir + " " + translator + " " + baseDir + " " + cmdArgs);
@@ -161,13 +161,19 @@ public class DedicatedService extends Service {
                     try{
 
                         BufferedReader reader = new BufferedReader(
-                                new InputStreamReader(process.getInputStream()));
+							new InputStreamReader(process.getInputStream()));
+						BufferedReader errorReader = new BufferedReader(
+							new InputStreamReader(process.getErrorStream()));
                         String str = null;
-                        while ((str = reader.readLine()) != null) {
-                            printText(str);
-							}
+						String errstr = null;
+                        while (((str = reader.readLine()) != null) || 
+							   ((errstr = errorReader.readLine()) != null)) {
+                            if (str != null) printText(str);
+							if (errstr != null) printText(errstr);
+						}
                         reader.close();
-
+						errorReader.close();
+						
                         // Waits for the command to finish.
                         if( process != null )
                             process.waitFor();
