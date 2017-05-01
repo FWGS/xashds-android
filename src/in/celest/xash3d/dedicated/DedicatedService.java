@@ -53,10 +53,10 @@ public class DedicatedService extends Service {
 
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        filesDir = DedicatedActivity.filesDir;
-        translator = DedicatedActivity.translator;
-        baseDir = DedicatedActivity.gamePath;
-		cmdArgs = DedicatedActivity.argsString;
+        filesDir = intent.getStringExtra("files");
+        translator = intent.getStringExtra("translator");
+        baseDir = intent.getStringExtra("path");
+		cmdArgs = intent.getStringExtra("argv");
 
         iconRes = R.drawable.logo_wait;
 		

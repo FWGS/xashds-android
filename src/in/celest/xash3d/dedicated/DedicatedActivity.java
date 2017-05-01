@@ -50,6 +50,7 @@ public class DedicatedActivity extends Activity {
 	static LinearLayout output;
 	static ScrollView scroll;
 	static Spinner translatorSelector;
+	static Button startButton;
 	//views for server master screen
 	static EditText modDir;
 	static EditText serverDlls;
@@ -94,6 +95,16 @@ public class DedicatedActivity extends Activity {
 
 		if (tab) initLauncher();
 		else initMaster();
+		
+		if(getIntent().getBooleanExtra("autostart", false))
+		{
+			//do autostart
+			Toast.makeText(this, "Autostarting...", Toast.LENGTH_LONG).show();
+			
+			startServer(getIntent().getStringExtra("game"), getIntent().getStringExtra("files"), getIntent().getStringExtra("argv"), getIntent().getStringExtra("translator"));
+			isRunned = true;
+			startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
+		}
 	}
 
     private String[] listTranslators()
@@ -235,7 +246,7 @@ public class DedicatedActivity extends Activity {
 		LinearLayout button_bar = new LinearLayout(this);
 		button_bar.setOrientation(LinearLayout.HORIZONTAL);
 		button_bar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		final Button startButton = new Button(this);
+		startButton = new Button(this);
 		scroll = new ScrollView(this);
 		Button externalPicker = new Button(this);
 
@@ -486,6 +497,7 @@ public class DedicatedActivity extends Activity {
 		menu.add(Menu.NONE, 1, Menu.NONE, R.string.b_master);
 		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_refresh_cache);
 		menu.add(Menu.NONE, 3, Menu.NONE, R.string.b_about);
+		menu.add(Menu.NONE, 4, Menu.NONE, R.string.b_scut);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -516,6 +528,9 @@ public class DedicatedActivity extends Activity {
 				return true;
 			case 3:
 				startActivity(new Intent(DedicatedActivity.this, AboutActivity.class));
+				return true;
+			case 4:
+				createShortcut();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -559,6 +574,19 @@ public class DedicatedActivity extends Activity {
 		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
 		dedicatedServer.putExtra("argv", argsString);
 		dedicatedServer.putExtra("path", gamePath);
+		dedicatedServer.putExtra("translator", translator);
+		dedicatedServer.putExtra("files", filesDir);
+		this.startService(dedicatedServer);
+	}
+	
+	public void startServer(String game, String filesPath, String argv, String ctranslator)
+	{
+		unpackAssets();
+		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
+		dedicatedServer.putExtra("argv", argv);
+		dedicatedServer.putExtra("path", game);
+		dedicatedServer.putExtra("translator", ctranslator);
+		dedicatedServer.putExtra("files", filesPath);
 		this.startService(dedicatedServer);
 	}
 
@@ -716,5 +744,31 @@ public class DedicatedActivity extends Activity {
 				if (f.delete()) printText("Successfuly removed "+f.getName());
 		printText("");
 		unpackAssets();
+	}
+	
+	private void createShortcut()
+	{
+		Intent shortcutIntent = new Intent(getApplicationContext(),
+										DedicatedActivity.class);
+		shortcutIntent.setAction(Intent.ACTION_MAIN);
+		
+		shortcutIntent.putExtra("autostart", true);
+		shortcutIntent.putExtra("translator", translator);
+		shortcutIntent.putExtra("files", filesDir);
+		shortcutIntent.putExtra("game", gamePath);
+		shortcutIntent.putExtra("argv", argsString);
+
+		Intent addIntent = new Intent();
+		addIntent
+            .putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+		addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, "Launch server");
+		addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+						   Intent.ShortcutIconResource.fromContext(getApplicationContext(),
+																   R.drawable.logo));
+
+		addIntent
+            .setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+		addIntent.putExtra("duplicate", true);
+		getApplicationContext().sendBroadcast(addIntent);
 	}
 }
