@@ -42,6 +42,7 @@ import android.os.Environment;
 import java.util.*;
 import android.view.View.*;
 import android.graphics.*;
+import java.io.*;
 
 public class DedicatedActivity extends Activity {
 	//views for launcher screen
@@ -85,6 +86,8 @@ public class DedicatedActivity extends Activity {
 	static String 	autoArgv;
 	static String 	autoGame;
 	static String 	autoTranslator;
+	
+	static Bitmap 	gameIcon = null;
 
 	private MenuItem launcherItem;
 
@@ -597,6 +600,7 @@ public class DedicatedActivity extends Activity {
 	
 	public void startServer(String game, String filesPath, String argv, String ctranslator)
 	{
+		getIcon();
 		unpackAssets();
 		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
 		dedicatedServer.putExtra("argv", argv);
@@ -797,7 +801,61 @@ public class DedicatedActivity extends Activity {
 	
 	private void createShortcut()
 	{
+		getIcon();
 		Intent intent = new Intent(DedicatedActivity.this, ShortcutCreatorActivity.class);
 		startActivity(intent);
+	}
+	
+	public void getIcon()
+	{
+		Bitmap icon = null;
+		
+		int size = (int) getResources().getDimension(android.R.dimen.app_icon_size);
+		
+		String game = CommandParser.parseSingleParameter(argsString, "-game");
+		String gamedirstring = gamePath+"/"+(game.length()!=0?game:"valve");
+		try
+		{
+			icon = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(gamedirstring+"/icon.png"), size, size, false);
+		}
+		catch(Exception e)
+		{
+		}
+		if(icon == null) try
+			{
+				icon = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(gamedirstring+"/game.ico"), size, size, false);
+			}
+			catch(Exception e)
+			{
+			}
+		if(icon == null) try
+			{
+				FilenameFilter icoFilter = new FilenameFilter() {
+					public boolean accept(File dir, String name) {
+						if(name.endsWith(".ico") || name.endsWith(".ICO")) {
+							return true;
+						}
+						return false;
+					}
+				};
+
+				File gamedirfile = new File(gamedirstring);
+				String files[] = gamedirfile.list(icoFilter);
+				icon = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(gamedirstring+"/"+files[0]), size, size, false);
+			}
+			catch(Exception e)
+			{
+				// Android may not support ico loading, so fallback if something going wrong
+				icon = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+			}
+
+			
+		Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+		Bitmap result = Bitmap.createBitmap(icon.getWidth(), icon.getHeight(), icon.getConfig());
+		Canvas canvas = new Canvas(result);
+		canvas.drawBitmap(icon, 0, 0, null);
+		canvas.drawBitmap(Bitmap.createScaledBitmap(background, icon.getWidth()/2, icon.getHeight()/2, true), 0, 0, null);
+		
+		gameIcon = result;
 	}
 }

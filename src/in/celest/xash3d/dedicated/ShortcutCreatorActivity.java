@@ -4,6 +4,7 @@ import android.os.*;
 import android.content.*;
 import android.widget.*;
 import android.view.*;
+import android.graphics.*;
 
 public class ShortcutCreatorActivity extends Activity
 {
@@ -107,9 +108,12 @@ public class ShortcutCreatorActivity extends Activity
 		addIntent
             .putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
 		addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, sname.getText().toString());
-		addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
-						   Intent.ShortcutIconResource.fromContext(getApplicationContext(),
-																   R.drawable.logo));
+		//addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+		//				   Intent.ShortcutIconResource.fromContext(getApplicationContext(),
+		//														   R.drawable.logo));
+		Bitmap scaledBitmap = Bitmap.createScaledBitmap(DedicatedActivity.gameIcon, 128, 128, true);
+		addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON,
+						   scaledBitmap);
 
 		addIntent
             .setAction("com.android.launcher.action.INSTALL_SHORTCUT");

@@ -89,8 +89,7 @@ public class DedicatedService extends Service {
 				canConnect = false;
 			}
 			
-		Notification.Builder builder = new Notification.Builder(this)
-			.setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
+		Notification.Builder builder = new Notification.Builder(this).setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
 		builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(getApplicationContext(), DedicatedActivity.class), 0));
         serverNotify = builder.build();
 		
