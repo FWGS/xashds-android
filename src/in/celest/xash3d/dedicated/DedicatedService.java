@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import android.app.*;
 import java.util.*;
+import java.io.*;
 
 /**
  * Created by Greg on 11.03.2017.
@@ -40,6 +41,8 @@ public class DedicatedService extends Service {
     static String translator = "qemu";
     static String baseDir;
     static String cmdArgs;
+	
+	static boolean newXash = true;
 
     private int iconRes;
 	
@@ -146,8 +149,8 @@ public class DedicatedService extends Service {
             }
             else
             if(translator == "qemu")
-				//process = Runtime.getRuntime().exec(filesDir+"/xash-old " + cmdArgs);
-                process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir +" "+ filesDir +"/xash " + cmdArgs);
+				process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+baseDir+" "+filesDir+"/xash "+cmdArgs);
+                //process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir + " " + filesDir +"ld-linux.so.2 --library-path "+filesDir+" "+ filesDir +"/xash " + cmdArgs);
             else
                 process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-translator.sh " + filesDir + " " + translator + " " + baseDir + " " + cmdArgs);
             Thread t = new Thread(new Runnable() {
@@ -231,5 +234,15 @@ public class DedicatedService extends Service {
 		} catch (Exception e) {
 			return true;
 		}
+	}
+	
+	static void sendCmd(String com)
+	{
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+		try {
+			writer.write(com);
+			writer.newLine();
+			writer.flush();
+		} catch (Exception e) {}
 	}
 }

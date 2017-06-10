@@ -47,6 +47,7 @@ public class DedicatedActivity extends Activity {
 	//views for launcher screen
 	static EditText cmdArgs;
 	static EditText baseDir;
+	static EditText cmdLine;
 	static LinearLayout output;
 	static ScrollView scroll;
 	static Spinner translatorSelector;
@@ -126,8 +127,10 @@ public class DedicatedActivity extends Activity {
 
 	private void printText(String str)
 	{
-		TextView line = new TextView(this);
-		line.setText(str);
+		//TextView line = new TextView(this);
+		//line.setText(str);
+		ConsoleView line = new ConsoleView(this);
+		line.addString(str);
 		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		if(output.getChildCount() > 1024)
 			output.removeViewAt(0);
@@ -141,7 +144,6 @@ public class DedicatedActivity extends Activity {
 				isScrolling = false;
 			}
 		}, 200);
-		
 		isScrolling = true;
 		//croll.fullScroll(ScrollView.FOCUS_DOWN);
 	}
@@ -229,12 +231,27 @@ public class DedicatedActivity extends Activity {
 		baseDir = new EditText(this);
 		baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		baseDir.setSingleLine();
+		
+		cmdLine = new EditText(this);
+		cmdLine.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		cmdLine.setSingleLine();
+		cmdLine.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override 
+			public boolean onLongClick(View v)
+			{
+				sendCommand(cmdLine.getText().toString());
+				cmdLine.setText("");
+				return true;
+			}
+		});
 
 		LinearLayout button_bar = new LinearLayout(this);
 		button_bar.setOrientation(LinearLayout.HORIZONTAL);
 		button_bar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		final Button startButton = new Button(this);
 		scroll = new ScrollView(this);
+		scroll.setBackgroundColor(Color.BLACK);
+		scroll.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.MATCH_PARENT));
 		Button externalPicker = new Button(this);
 
 		externalPicker.setText(R.string.b_sd);
@@ -320,6 +337,7 @@ public class DedicatedActivity extends Activity {
 			//button_bar.addView(externalPicker);
 		if (isXashInstalled()) button_bar.addView(launchXash);
 		launcher.addView(button_bar);
+		launcher.addView(cmdLine);
 		scroll.addView(output);
 		launcher.addView(scroll);
 
@@ -603,6 +621,7 @@ public class DedicatedActivity extends Activity {
 	}
 	
 	public void unpackAsset(String name) throws Exception {
+		printText("Unpacking "+name+"...");
 		AssetManager assetManager = getApplicationContext().getAssets();
 		byte[] buffer = new byte[1024];
 		int read;
@@ -613,6 +632,7 @@ public class DedicatedActivity extends Activity {
 		}
 		out.close(); 
 		in.close();
+		printText("[OK]\n");
 	}
 	
 	public void unpackAssets()
@@ -624,26 +644,22 @@ public class DedicatedActivity extends Activity {
 			if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != mPref.getInt("lastversion", 1)) )
 			{
 				//Unpack files now
-				printText("Unpacking xash... ");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 				unpackAsset("xash");
-				printText("[OK]\nUnpacking xash_sse2 ...");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 				unpackAsset("xash_sse2");
-				printText("[OK]\nUnpacking start-translator.sh ...");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 				unpackAsset("start-translator.sh");
-				printText("[OK]\nUnpacking tracker ...");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 				unpackAsset("tracker");
-				printText("[OK]\nUnpacking qemu-i386-static ...");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 				unpackAsset("qemu-i386-static");
 				
 				unpackAsset("xash-old");
+				
 				printText("[OK]\nSetting permissions.\n");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static "+filesDir+"/xash-old").waitFor();
+				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static "+filesDir+"/xash-old ").waitFor();
 			}
 		} catch (Exception e) {}
 	}
@@ -670,5 +686,11 @@ public class DedicatedActivity extends Activity {
 			if (f.delete()) printText("Successfuly removed "+f.getName());
 		printText("");
 		unpackAssets();
+	}
+	
+	public void sendCommand(String s)
+	{
+		DedicatedService.sendCmd(s);
+		printText("/> "+s);
 	}
 }
