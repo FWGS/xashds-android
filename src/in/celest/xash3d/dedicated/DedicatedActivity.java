@@ -266,6 +266,7 @@ public class DedicatedActivity extends Activity {
 		cmdLine = new EditText(this);
 		cmdLine.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		cmdLine.setSingleLine();
+		cmdLine.setHint(R.string.h_cmd);
 		cmdLine.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override 
 			public boolean onLongClick(View v)
@@ -881,7 +882,10 @@ public class DedicatedActivity extends Activity {
 	
 	public void sendCommand(String s)
 	{
-		DedicatedService.sendCmd(s);
-		printText("/> "+s);
+		if ((!s.equals(""))&&DedicatedService.isStarted)
+		{
+			DedicatedService.sendCmd(s);
+			printText("/> "+s);
+		}
 	}
 }
