@@ -90,7 +90,8 @@ public class ListActivity extends Activity {
             if (!(isGameSelector&&(!f.isDirectory())))
 				if (isMapSelector) {if (f.getName().lastIndexOf(".bsp") != -1) layout.addView(v); }
 					else if (!isDllSelector) layout.addView(v);
-						else if (f.getName().lastIndexOf(".dll") != -1) layout.addView(v);
+						else if ((f.getName().lastIndexOf(".dll") != -1)||
+									(f.getName().lastIndexOf(".so") != -1)) layout.addView(v);
         } else {
 			TextView v = new TextView(this);
             v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));

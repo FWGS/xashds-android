@@ -64,19 +64,23 @@ public class ConnectActivity extends Activity
 	}
 	
 	public void startHacks() {
-		String game = CommandParser.parseSingleParameter(DedicatedActivity.argsString, "-game");
+		String arguments = DedicatedActivity.autostarted?DedicatedActivity.autoArgv:DedicatedActivity.argsString;
+		
+		String game = CommandParser.parseSingleParameter(arguments, "-game");
 		Intent intent = new Intent();
 		intent.setAction("in.celest.xash3d.START");
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		intent.putExtra("argv", "-dev 3 +xashds_hacks 1 +rcon_address 127.0.0.1 +rcon_password "+CommandParser.parseSingleParameter(DedicatedActivity.argsString, "+rcon_password"));
+		intent.putExtra("argv", "-dev 3 +xashds_hacks 1 +rcon_address 127.0.0.1 +rcon_password "+CommandParser.parseSingleParameter(arguments, "+rcon_password"));
 		if (!game.equals("")) intent.putExtra("gamedir", game);
 
 		startActivity(intent);
 	}
 	
 	public void startConnect(){
-		String game = CommandParser.parseSingleParameter(DedicatedActivity.argsString, "-game");
+		String arguments = DedicatedActivity.autostarted?DedicatedActivity.autoArgv:DedicatedActivity.argsString;
+
+		String game = CommandParser.parseSingleParameter(arguments, "-game");
 		Intent intent = new Intent();
 		intent.setAction("in.celest.xash3d.START");
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

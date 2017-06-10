@@ -56,10 +56,10 @@ public class DedicatedService extends Service {
 
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        filesDir = DedicatedActivity.filesDir;
-        translator = DedicatedActivity.translator;
-        baseDir = DedicatedActivity.gamePath;
-		cmdArgs = DedicatedActivity.argsString;
+        filesDir = intent.getStringExtra("files");
+        translator = intent.getStringExtra("translator");
+        baseDir = intent.getStringExtra("path");
+		cmdArgs = intent.getStringExtra("argv");
 
         iconRes = R.drawable.logo_wait;
 		
@@ -92,11 +92,10 @@ public class DedicatedService extends Service {
 				canConnect = false;
 			}
 			
-		Notification.Builder builder = new Notification.Builder(this)
-			.setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
+		Notification.Builder builder = new Notification.Builder(this).setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
 		builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(getApplicationContext(), DedicatedActivity.class), 0));
         serverNotify = builder.build();
-
+		
         startForeground(777, serverNotify);
 		
 		if (DedicatedStatics.launched != null) { 
@@ -143,14 +142,13 @@ public class DedicatedService extends Service {
             }
             killAll(filesDir+"/qemu-i386-static");
             killAll(filesDir+"/ubt");
-            if(translator == "none")
+            if(translator.equals("none"))
             {
                 process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-x86.sh " + filesDir + " " + baseDir + " " + cmdArgs);
             }
             else
-            if(translator == "qemu")
-				process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+baseDir+" "+filesDir+"/xash "+cmdArgs);
-                //process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir + " " + filesDir +"ld-linux.so.2 --library-path "+filesDir+" "+ filesDir +"/xash " + cmdArgs);
+            if(translator.equals("qemu"))
+                process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir +" "+ filesDir +"/xash " + cmdArgs);
             else
                 process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-translator.sh " + filesDir + " " + translator + " " + baseDir + " " + cmdArgs);
             Thread t = new Thread(new Runnable() {
@@ -176,7 +174,8 @@ public class DedicatedService extends Service {
 							if (errstr != null) printText(errstr);
 							}
                         reader.close();
-
+						errorReader.close();
+						
                         // Waits for the command to finish.
                         if( process != null )
                             process.waitFor();

@@ -3,7 +3,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="in.celest.xash3d.dedicated"
       android:versionCode="5"
-      android:versionName="1.1-forked">
+      android:versionName="1.2-forked">
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="5"/>
     <!-- Set your application name here -->
     <application android:label="XashDS"
@@ -25,11 +25,21 @@
             android:exported="true"
 			android:theme="@style/AppDialog"/>
 		
+		<activity android:name=".AboutActivity"
+            android:label="@string/c_about"
+            android:exported="true"
+			android:theme="@style/AppDialog"/>
+		
 		<activity android:name=".ConnectActivity"
 			android:label="Connect..."
 			android:exported="true"
 			android:theme="@style/AppDialog"/>
 
+		<activity android:name=".ShortcutCreatorActivity"
+			android:label="Create shortcut..."
+			android:exported="true"
+			android:theme="@style/AppDialog"/>
+		
         <service android:name=".DedicatedService"
             android:exported="false"
             android:enabled="true"/>
@@ -37,4 +47,5 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> 
     <uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
 </manifest> 

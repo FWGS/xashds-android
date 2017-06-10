@@ -11,11 +11,15 @@
 	
 	<string name="b_sd">Разрешить RW для внешней SD!</string>
 	
+	<string name="b_refresh_cache">Обновить файлы</string>
+	
 	<string name="b_master">Настройщик сервера</string>
 	<string name="b_master_close">Закрыть настройщик</string>
 	
-	<string name="b_refresh_cache">Обновить файлы</string>
+	<string name="b_about">О программе</string>
 
+	<string name="b_scut">Создать ярлык</string>
+	
 	<string name="b_close">Закрыть</string>
 
 	<string name="b_select">Выбор...</string>
@@ -35,6 +39,11 @@
 	<string name="l_map">Имя стартовой карты</string>
 	<string name="l_rcon">Пароль для удалённого (rcon) контроля</string>
 	
+	<string name="l_scut_name">Название ярлыка: </string>
+	<string name="l_scut_gamel">Запуск игры после загрузки сервера</string>
+	<string name="l_scut_gamem1">Через \"+connect\"</string>
+	<string name="l_scut_gamem2">Через xashds_hacks</string>
+	
 	<string name="h_map">Например: crossfire</string>
 	<string name="h_dlls">Например: dlls/decay.dll</string>
 	<string name="h_game">Например: gearbox; decay</string>
@@ -44,4 +53,8 @@
 	<string name="v_islog">Включить логгирование:</string>
 	<string name="v_isdm">Режим игры: deathmatch</string>
 	<string name="v_iscoop">Режим игры: кооператив</string>
+	<string name="v_ispublic">Сервер в Internet</string>
+	<string name="v_islan">Сервер в LAN</string>
+	
+	<string name="t_about1">XashDS Andoid (v1.2-forked)\nОригинальное приложение: mittorn (FWGS team)\nФорк: GregTheMadMonk (Greg)\n\nОсобые благодарности:\n-Дяде Мише за Xash3D\n-FWGS team за Xash3D FWGS и первый XashDS\n-Valve за Half-Life и GoldSrc</string>
 </resources>
