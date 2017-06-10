@@ -79,7 +79,7 @@ public class DedicatedService extends Service {
 	{
 		if (process != null)
 			if (isRunning()) {
-				if (str.lastIndexOf("player server started") != -1) {
+				if ((str.lastIndexOf("player server started") != -1)||(str.lastIndexOf("Game started") != -1)) {
 					iconRes = R.drawable.logo_ok;
 					canConnect = true;
 					}
