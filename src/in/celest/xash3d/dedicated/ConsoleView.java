@@ -4,6 +4,8 @@ import android.content.*;
 import android.graphics.*;
 import java.util.*;
 import android.util.*;
+import org.apache.http.impl.*;
+import android.widget.*;
 
 public class ConsoleView extends View
 {
@@ -14,6 +16,11 @@ public class ConsoleView extends View
 	
 	private int scrollindex = 1;
 	
+	private boolean isSelected;
+	private int defTextCol = Color.WHITE;
+	
+	private static ConsoleView highlighted = null;
+	
 	private float tx, ty;
 	private float h, w;
 	
@@ -22,13 +29,15 @@ public class ConsoleView extends View
 		super(context);
 		
 		bg.setColor(Color.BLACK);
-		basictext.setColor(Color.WHITE);
+		basictext.setColor(defTextCol);
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas)
 	{
 		super.onDraw(canvas);
+		
+		basictext.setColor(defTextCol);
 		
 		h = canvas.getHeight();
 		w = canvas.getWidth();
@@ -72,7 +81,7 @@ public class ConsoleView extends View
 							switch (colorcode)
 							{
 								case 0:
-									basictext.setColor(Color.WHITE);
+									basictext.setColor(defTextCol);
 									break;
 								case 30:
 									basictext.setColor(Color.DKGRAY);
@@ -137,8 +146,28 @@ public class ConsoleView extends View
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if (event.getY() <= h/2) if (scrollindex < strings.size()-1) scrollindex++;
-		
+		if (isSelected)
+		{
+			defTextCol = Color.WHITE;
+			bg.setColor(Color.BLACK);
+			isSelected = false;
+			
+			String text = removeColorcodes(strings.get(strings.size()-1));
+			
+			ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE); 
+			ClipData clip = ClipData.newPlainText(text, text);
+			clipboard.setPrimaryClip(clip);
+			
+			Toast.makeText(getContext(), "Text copied to clipboard", Toast.LENGTH_SHORT).show();
+			
+			highlighted = null;
+		} else {
+			defTextCol = Color.BLACK;
+			bg.setColor(Color.WHITE);
+			if (highlighted != null) highlighted.toggleSelected();
+			highlighted = this;
+			isSelected = true;
+		}
 		invalidate();
 		
 		return super.onTouchEvent(event);
@@ -199,5 +228,55 @@ public class ConsoleView extends View
 		setMinimumHeight(y - deltay/2);
 		
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+	}
+	
+	public void toggleSelected()
+	{
+		if (isSelected)
+		{
+			defTextCol = Color.WHITE;
+			bg.setColor(Color.BLACK);
+			isSelected = false;
+		} else {
+			defTextCol = Color.BLACK;
+			bg.setColor(Color.WHITE);
+			isSelected = true;
+		}
+		
+		invalidate();
+	}
+	
+	public static String removeColorcodes(String current)
+	{
+		String ret = "";
+		
+		boolean listencolor = false;
+
+		for (int j = 0; j < current.length(); j++)
+		{
+			final String c = String.valueOf(current.charAt(j));
+
+			switch (c.charAt(0))
+			{
+				case '\033':
+					listencolor = true;
+					break;
+				case '[':
+					if (listencolor) break;
+				case 'm':
+					if (listencolor) 
+					{
+						listencolor = false;
+						break;
+					}
+				default:
+					if (!listencolor)
+					{
+						ret += c;
+					}
+			}
+		}
+		
+		return ret;
 	}
 }

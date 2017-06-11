@@ -51,7 +51,7 @@ public class DedicatedService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-		printText("Service created!");
+		printText(DedicatedStatics.MESS_SERVICE_STARTING);
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -66,11 +66,11 @@ public class DedicatedService extends Service {
         isStarted = true;
         game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
         if (game == "") game = "hl";
-        updateNotification("Starting...");
+        updateNotification(DedicatedStatics.MESS_BINARIES_STARTING);
 
         startAction();
 
-		printText("Service started!");
+		printText(DedicatedStatics.MESS_SERVICE_STARTED);
 				
         return START_STICKY;
     }
@@ -109,12 +109,13 @@ public class DedicatedService extends Service {
 
     @Override
     public void onDestroy() {
+		printText(DedicatedStatics.MESS_SERVICE_KILLING);
         super.onDestroy();
         startAction();
         isStarted = false;
 		canConnect = false;
 		if (DedicatedStatics.launched != null) DedicatedStatics.launched.setCanConnect(canConnect);
-		printText("Service destroyed.");
+		printText(DedicatedStatics.MESS_SERVICE_KILLED);
 	}
 
     @Override
