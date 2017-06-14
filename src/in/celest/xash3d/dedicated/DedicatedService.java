@@ -91,20 +91,23 @@ public class DedicatedService extends Service {
 				iconRes = R.drawable.logo_error;
 				canConnect = false;
 			}
+		
+
+		if (DedicatedStatics.launched != null) { 
+			DedicatedStatics.launched.printLog(str);
+			DedicatedStatics.launched.setCanConnect(canConnect);
+		}
+
+		DedicatedStatics.logView.add(str);
+		if (DedicatedStatics.logView.size() >= 1023) DedicatedStatics.logView.remove(0);
+		
+		str = ConsoleView.removeColorcodes(str);
 			
 		Notification.Builder builder = new Notification.Builder(this).setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
 		builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(getApplicationContext(), DedicatedActivity.class), 0));
         serverNotify = builder.build();
 		
         startForeground(777, serverNotify);
-		
-		if (DedicatedStatics.launched != null) { 
-			DedicatedStatics.launched.printLog(str);
-			DedicatedStatics.launched.setCanConnect(canConnect);
-			}
-		
-		DedicatedStatics.logView.add(str);
-		if (DedicatedStatics.logView.size() >= 1023) DedicatedStatics.logView.remove(0);
 	}
 
     @Override
