@@ -20,10 +20,13 @@ import android.content.*;
 
 public class ListActivity extends Activity {
 	private String folder;
-	private boolean isGameSelector, isMapSelector, isDllSelector;
+	private boolean isGameSelector, isMapSelector, isDllSelector, isBaseSelector;
 	
 	private String filePath;
 	private String relativePath;
+	
+	private LinearLayout layout;
+	private TextView header;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,7 @@ public class ListActivity extends Activity {
 		isGameSelector = folder.equals("");
 		isMapSelector = folder.equals("maps");
 		isDllSelector = folder.equals("dlls");
+		isBaseSelector = folder.equals("basedir");
 
         ScrollView content = new ScrollView(this);
 		content.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -43,13 +47,14 @@ public class ListActivity extends Activity {
 		mainlayout.setLayoutParams((new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT)));
 		mainlayout.setOrientation(LinearLayout.VERTICAL);
 
-		LinearLayout layout = new LinearLayout(this);
+		layout = new LinearLayout(this);
 		layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		layout.setOrientation(LinearLayout.VERTICAL);
 
-        TextView header = new TextView(this);
+        header = new TextView(this);
         header.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-        header.setText("./"+folder);
+        if (!isBaseSelector) header.setText("./"+folder);
+			else header.setText(getIntent().getStringExtra("dir"));
         //header.setTextAppearance(this, android.R.);
 
 		Button exit = new Button(this);
@@ -63,8 +68,17 @@ public class ListActivity extends Activity {
 			});
 
 		mainlayout.addView(exit);
+		
+		if (isBaseSelector)
+		{
+			Button ok = new Button(this);
+			ok.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+			ok.setText(R.string.b_select);
+			ok.setOnClickListener(new OkClickListener());
+			mainlayout.addView(ok);
+		}
 
-        layout.addView(header);
+        mainlayout.addView(header);
 		
         File dir;
 		
@@ -74,24 +88,38 @@ public class ListActivity extends Activity {
 		if (isGameSelector) {
 			filePath = DedicatedActivity.gamePath;
 			relativePath = "";
-		} else {
-			filePath = makeDir(DedicatedActivity.gamePath, game, folder);
-			relativePath = folder + "/";
-			}
+		} else if (isBaseSelector)
+			{
+				filePath = getIntent().getStringExtra("dir");
+			} else {
+					filePath = makeDir(DedicatedActivity.gamePath, game, folder);
+					relativePath = folder + "/";
+				}
 		dir = new File(filePath);
         File[] files = dir.listFiles();
-
+		
+		if (isBaseSelector && (!filePath.equals("/")))
+		{
+			Button toParent = new Button(this);
+			toParent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+			toParent.setText("..");
+			toParent.setOnClickListener(new BaseDirPickerListener(".."));
+			layout.addView(toParent);
+		} 
+		
         if (files != null) for (File f : files)
         {
             Button v = new Button(this);
             v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
             v.setText(f.getName());
-			v.setOnClickListener(new FilePickerListener(f.getName()));
+			if (isBaseSelector) v.setOnClickListener(new BaseDirPickerListener(f.getName()));
+				else v.setOnClickListener(new FilePickerListener(f.getName()));
             if (!(isGameSelector&&(!f.isDirectory())))
 				if (isMapSelector) {if (f.getName().lastIndexOf(".bsp") != -1) layout.addView(v); }
 					else if (!isDllSelector) layout.addView(v);
 						else if ((f.getName().lastIndexOf(".dll") != -1)||
 									(f.getName().lastIndexOf(".so") != -1)) layout.addView(v);
+							else if (isBaseSelector && f.isDirectory()) layout.addView(v);
         } else {
 			TextView v = new TextView(this);
             v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
@@ -139,6 +167,73 @@ public class ListActivity extends Activity {
 		}
 	}
 	
+	public class OkClickListener implements View.OnClickListener
+	{
+		@Override
+		public void onClick(View p1)
+		{
+			makeResult(filePath);
+		}
+	}
+	
+	public class BaseDirPickerListener implements View.OnClickListener
+	{
+		String directory;
+		
+		BaseDirPickerListener(String d)
+		{
+			directory = d;
+		}
+		
+		@Override
+		public void onClick(View p1)
+		{
+			layout.removeAllViews();
+			
+			File dir;
+
+			if (directory.equals(".."))
+			{
+				if (filePath.charAt(filePath.length()-1) == '/') filePath = filePath.substring(0, filePath.length()-2);
+				filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+				filePath += "/";
+			} else 
+			{
+				if (filePath.charAt(filePath.length()-1) != '/') filePath += "/";
+				filePath += directory;
+			}
+			
+			header.setText(filePath);
+			
+			dir = new File(filePath);
+			File[] files = dir.listFiles();
+
+			if (!filePath.equals("/"))
+			{
+				Button toParent = new Button(ListActivity.this);
+				toParent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+				toParent.setText("..");
+				toParent.setOnClickListener(new BaseDirPickerListener(".."));
+				layout.addView(toParent);
+			}
+				
+			if (files != null) for (File f : files)
+				{
+					Button v = new Button(ListActivity.this);
+					v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+					v.setText(f.getName());
+					if (isBaseSelector) v.setOnClickListener(new BaseDirPickerListener(f.getName()));
+					else v.setOnClickListener(new FilePickerListener(f.getName()));
+					if (f.isDirectory()) layout.addView(v);
+				} else {
+				TextView v = new TextView(ListActivity.this);
+				v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+				v.setText(R.string.l_notfound);
+				layout.addView(v);
+			}
+		}
+	}
+	
 	private void makeResult(String result)
 	{
 		Intent data = new Intent();
@@ -146,7 +241,8 @@ public class ListActivity extends Activity {
 		data.putExtra("folder", folder);
 		data.putExtra("result", result);
 		
-		if (getParent() == null) setResult(RESULT_OK, data);
+		if (getParent() == null) {setResult(RESULT_OK, data);
+			Toast.makeText(this, "null parent", Toast.LENGTH_SHORT).show();}
 			else getParent().setResult(RESULT_OK, data);
 		
 		finish();

@@ -260,7 +260,7 @@ public class DedicatedActivity extends Activity {
 		baseDir = new EditText(this);
 		baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		baseDir.setSingleLine();
-
+		baseDir.setOnLongClickListener(new BaseDirPickListener());
 
 		LinearLayout button_bar = new LinearLayout(this);
 		button_bar.setOrientation(LinearLayout.HORIZONTAL);
@@ -650,6 +650,21 @@ public class DedicatedActivity extends Activity {
 			startActivityForResult(newi, 1998);
 		}
 	}
+	
+	public class BaseDirPickListener implements View.OnLongClickListener
+	{
+		@Override
+		public boolean onLongClick(View p1)
+		{
+			saveSettings();
+			Intent newi = new Intent(DedicatedActivity.this, ListActivity.class);
+			newi.putExtra("folder", "basedir");
+			newi.putExtra("dir", baseDir.getText().toString());
+			startActivityForResult(newi, 1998);
+			
+			return true;
+		}
+	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -660,15 +675,21 @@ public class DedicatedActivity extends Activity {
 				String result = data.getStringExtra("result");
 				final String folder = data.getStringExtra("folder");
 				printText("Returned result: "+result);
-
+				
 				switch (folder) {
 					case "dlls":
 						if (serverDlls.getText().toString().lastIndexOf(result) == -1) 
 							if (serverDlls.getText().toString().equals("")) serverDlls.append(result);
 							else serverDlls.append(", "+result);
+						pushMasterSettings();
 						break;
 					case "maps":
 						serverMap.setText(result);
+						pushMasterSettings();
+						break;
+					case "basedir":
+						baseDir.setText(result);
+						saveSettings();
 						break;
 					case "":
 						if (!modDir.getText().toString().equals(result)) {
@@ -676,10 +697,10 @@ public class DedicatedActivity extends Activity {
 							serverMap.setText("");
 						}
 						modDir.setText((result.equals("valve"))?"":result);
+						pushMasterSettings();
 						break;
 				}
 
-				pushMasterSettings();
 				saveSettings();
 			}
 	}
