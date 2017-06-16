@@ -241,8 +241,7 @@ public class ListActivity extends Activity {
 		data.putExtra("folder", folder);
 		data.putExtra("result", result);
 		
-		if (getParent() == null) {setResult(RESULT_OK, data);
-			Toast.makeText(this, "null parent", Toast.LENGTH_SHORT).show();}
+		if (getParent() == null) setResult(RESULT_OK, data);
 			else getParent().setResult(RESULT_OK, data);
 		
 		finish();
