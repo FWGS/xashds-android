@@ -13,6 +13,7 @@ import java.io.File;
 import android.view.*;
 import android.view.View.*;
 import android.content.*;
+import android.graphics.*;
 
 /**
  * Created by Greg on 13.03.2017.
@@ -114,12 +115,22 @@ public class ListActivity extends Activity {
             v.setText(f.getName());
 			if (isBaseSelector) v.setOnClickListener(new BaseDirPickerListener(f.getName()));
 				else v.setOnClickListener(new FilePickerListener(f.getName()));
-            if (!(isGameSelector&&(!f.isDirectory())))
-				if (isMapSelector) {if (f.getName().lastIndexOf(".bsp") != -1) layout.addView(v); }
-					else if (!isDllSelector) layout.addView(v);
-						else if ((f.getName().lastIndexOf(".dll") != -1)||
-									(f.getName().lastIndexOf(".so") != -1)) layout.addView(v);
-							else if (isBaseSelector && f.isDirectory()) layout.addView(v);
+				
+			if (isBaseSelector && f.isDirectory())
+			{
+				if (checkSubdirs(f.getAbsolutePath())) v.setTextColor(Color.GREEN);
+				layout.addView(v);
+			} else if (isGameSelector && f.isDirectory())
+			{
+				layout.addView(v);
+			} else if (isMapSelector && (f.getName().lastIndexOf(".bsp") != -1))
+			{
+				layout.addView(v);
+			} else if (isDllSelector && ((f.getName().lastIndexOf(".dll") != -1)||
+				(f.getName().lastIndexOf(".so") != -1)))
+			{
+				layout.addView(v);
+			}
         } else {
 			TextView v = new TextView(this);
             v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
@@ -224,7 +235,10 @@ public class ListActivity extends Activity {
 					v.setText(f.getName());
 					if (isBaseSelector) v.setOnClickListener(new BaseDirPickerListener(f.getName()));
 					else v.setOnClickListener(new FilePickerListener(f.getName()));
-					if (f.isDirectory()) layout.addView(v);
+					if (f.isDirectory()) {
+						if (checkSubdirs(f.getAbsolutePath())) v.setTextColor(Color.GREEN);
+						layout.addView(v);
+						}
 				} else {
 				TextView v = new TextView(ListActivity.this);
 				v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
@@ -245,5 +259,19 @@ public class ListActivity extends Activity {
 			else getParent().setResult(RESULT_OK, data);
 		
 		finish();
+	}
+	
+	private boolean checkSubdirs(String inDir)
+	{
+		boolean result = false;
+
+		File[] dirs = new File(inDir).listFiles();
+		
+		if (dirs != null) for (File f : dirs)
+			{
+				if (f.isDirectory() && (f.getName().equals("valve"))) result = true;
+			}
+
+		return result;
 	}
 }
