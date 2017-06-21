@@ -29,12 +29,14 @@ public class ListActivity extends Activity {
 	private LinearLayout layout;
 	private TextView header;
 	
+	private int okTextColor = Color.argb(255, 0, 150, 0);
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-
+		
         folder = getIntent().getStringExtra("folder");
 		isGameSelector = folder.equals("");
 		isMapSelector = folder.equals("maps");
@@ -53,13 +55,13 @@ public class ListActivity extends Activity {
 		layout.setOrientation(LinearLayout.VERTICAL);
 
         header = new TextView(this);
-        header.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+        header.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
         if (!isBaseSelector) header.setText("./"+folder);
 			else header.setText(getIntent().getStringExtra("dir"));
         //header.setTextAppearance(this, android.R.);
 
 		Button exit = new Button(this);
-		exit.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+		exit.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 		exit.setText(R.string.b_close);
 		exit.setOnClickListener(new View.OnClickListener () {
 				@Override
@@ -73,7 +75,7 @@ public class ListActivity extends Activity {
 		if (isBaseSelector)
 		{
 			Button ok = new Button(this);
-			ok.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+			ok.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 			ok.setText(R.string.b_select);
 			ok.setOnClickListener(new OkClickListener());
 			mainlayout.addView(ok);
@@ -102,7 +104,7 @@ public class ListActivity extends Activity {
 		if (isBaseSelector && (!filePath.equals("/")))
 		{
 			Button toParent = new Button(this);
-			toParent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+			toParent.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 			toParent.setText("..");
 			toParent.setOnClickListener(new BaseDirPickerListener(".."));
 			layout.addView(toParent);
@@ -111,14 +113,14 @@ public class ListActivity extends Activity {
         if (files != null) for (File f : files)
         {
             Button v = new Button(this);
-            v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+            v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             v.setText(f.getName());
 			if (isBaseSelector) v.setOnClickListener(new BaseDirPickerListener(f.getName()));
 				else v.setOnClickListener(new FilePickerListener(f.getName()));
 				
 			if (isBaseSelector && f.isDirectory())
 			{
-				if (checkSubdirs(f.getAbsolutePath())) v.setTextColor(Color.GREEN);
+				if (checkSubdirs(f.getAbsolutePath())) v.setTextColor(okTextColor);
 				layout.addView(v);
 			} else if (isGameSelector && f.isDirectory())
 			{
@@ -133,7 +135,7 @@ public class ListActivity extends Activity {
 			}
         } else {
 			TextView v = new TextView(this);
-            v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT));
+            v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             v.setText(R.string.l_notfound);
             layout.addView(v);
 		}
@@ -143,6 +145,8 @@ public class ListActivity extends Activity {
 		mainlayout.addView(content);
 
         setContentView(mainlayout);
+		
+		getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
     }
 	
 	private String makeDir(String dir1, String game, String dir2)
@@ -236,7 +240,7 @@ public class ListActivity extends Activity {
 					if (isBaseSelector) v.setOnClickListener(new BaseDirPickerListener(f.getName()));
 					else v.setOnClickListener(new FilePickerListener(f.getName()));
 					if (f.isDirectory()) {
-						if (checkSubdirs(f.getAbsolutePath())) v.setTextColor(Color.GREEN);
+						if (checkSubdirs(f.getAbsolutePath())) v.setTextColor(okTextColor);
 						layout.addView(v);
 						}
 				} else {
