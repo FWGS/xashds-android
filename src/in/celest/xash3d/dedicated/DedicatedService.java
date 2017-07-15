@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import android.app.*;
 import java.util.*;
+import java.io.*;
 
 /**
  * Created by Greg on 11.03.2017.
@@ -40,6 +41,8 @@ public class DedicatedService extends Service {
     static String translator = "qemu";
     static String baseDir;
     static String cmdArgs;
+	
+	static boolean newXash = true;
 
     private int iconRes;
 	
@@ -48,7 +51,7 @@ public class DedicatedService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-		printText("Service created!");
+		printText(DedicatedStatics.MESS_SERVICE_STARTING);
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -63,11 +66,11 @@ public class DedicatedService extends Service {
         isStarted = true;
         game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
         if (game == "") game = "hl";
-        updateNotification("Starting...");
+        updateNotification(DedicatedStatics.MESS_BINARIES_STARTING);
 
         startAction();
 
-		printText("Service started!");
+		printText(DedicatedStatics.MESS_SERVICE_STARTED);
 				
         return START_STICKY;
     }
@@ -76,7 +79,7 @@ public class DedicatedService extends Service {
 	{
 		if (process != null)
 			if (isRunning()) {
-				if (str.lastIndexOf("player server started") != -1) {
+				if ((str.lastIndexOf("player server started") != -1)||(str.lastIndexOf("Game started") != -1)) {
 					iconRes = R.drawable.logo_ok;
 					canConnect = true;
 					}
@@ -88,30 +91,34 @@ public class DedicatedService extends Service {
 				iconRes = R.drawable.logo_error;
 				canConnect = false;
 			}
+		
+
+		if (DedicatedStatics.launched != null) { 
+			DedicatedStatics.launched.printLog(str);
+			DedicatedStatics.launched.setCanConnect(canConnect);
+		}
+
+		DedicatedStatics.logView.add(str);
+		if (DedicatedStatics.logView.size() >= 1023) DedicatedStatics.logView.remove(0);
+		
+		str = ConsoleView.removeColorcodes(str);
 			
 		Notification.Builder builder = new Notification.Builder(this).setSmallIcon(iconRes).setContentTitle("XashDS: "+game).setContentText(str);
 		builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(getApplicationContext(), DedicatedActivity.class), 0));
         serverNotify = builder.build();
 		
         startForeground(777, serverNotify);
-		
-		if (DedicatedStatics.launched != null) { 
-			DedicatedStatics.launched.printLog(str);
-			DedicatedStatics.launched.setCanConnect(canConnect);
-			}
-		
-		DedicatedStatics.logView.add(str);
-		if (DedicatedStatics.logView.size() >= 1023) DedicatedStatics.logView.remove(0);
 	}
 
     @Override
     public void onDestroy() {
+		printText(DedicatedStatics.MESS_SERVICE_KILLING);
         super.onDestroy();
         startAction();
         isStarted = false;
 		canConnect = false;
 		if (DedicatedStatics.launched != null) DedicatedStatics.launched.setCanConnect(canConnect);
-		printText("Service destroyed.");
+		printText(DedicatedStatics.MESS_SERVICE_KILLED);
 	}
 
     @Override
@@ -141,13 +148,13 @@ public class DedicatedService extends Service {
             killAll(filesDir+"/ubt");
             if(translator.equals("none"))
             {
-                process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-x86.sh " + filesDir + " " + baseDir + " " + cmdArgs);
+                process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-x86.sh " + filesDir + " " + baseDir + " " + DedicatedStatics.XASH_BINARY_SSE + " " + cmdArgs);
             }
             else
             if(translator.equals("qemu"))
-                process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir +" "+ filesDir +"/xash " + cmdArgs);
+                process = Runtime.getRuntime().exec(filesDir+"/qemu-i386-static -E XASH3D_BASEDIR="+ baseDir +" "+ filesDir +"/" + DedicatedStatics.XASH_BINARY + " " + cmdArgs);
             else
-                process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-translator.sh " + filesDir + " " + translator + " " + baseDir + " " + cmdArgs);
+                process = Runtime.getRuntime().exec("/system/bin/sh " + filesDir + "/start-translator.sh " + filesDir + " " + translator + " " + baseDir + " " + DedicatedStatics.XASH_BINARY + " " + cmdArgs);
             Thread t = new Thread(new Runnable() {
                 public void run() {
                     class OutputCallback implements Runnable {
@@ -160,16 +167,16 @@ public class DedicatedService extends Service {
                     try{
 
                         BufferedReader reader = new BufferedReader(
-							new InputStreamReader(process.getInputStream()));
+                                new InputStreamReader(process.getInputStream()));
 						BufferedReader errorReader = new BufferedReader(
-							new InputStreamReader(process.getErrorStream()));
+								new InputStreamReader(process.getErrorStream()));
                         String str = null;
 						String errstr = null;
                         while (((str = reader.readLine()) != null) || 
-							   ((errstr = errorReader.readLine()) != null)) {
+								((errstr = errorReader.readLine()) != null)) {
                             if (str != null) printText(str);
 							if (errstr != null) printText(errstr);
-						}
+							}
                         reader.close();
 						errorReader.close();
 						
@@ -230,5 +237,15 @@ public class DedicatedService extends Service {
 		} catch (Exception e) {
 			return true;
 		}
+	}
+	
+	static void sendCmd(String com)
+	{
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+		try {
+			writer.write(com);
+			writer.newLine();
+			writer.flush();
+		} catch (Exception e) {}
 	}
 }

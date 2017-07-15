@@ -48,6 +48,7 @@ public class DedicatedActivity extends Activity {
 	//views for launcher screen
 	static EditText cmdArgs;
 	static EditText baseDir;
+	static EditText cmdLine;
 	static LinearLayout output;
 	static ScrollView scroll;
 	static Spinner translatorSelector;
@@ -73,6 +74,8 @@ public class DedicatedActivity extends Activity {
 	static String gamePath;
 
 	static boolean isDev = false;
+	
+	static boolean isNewBinary = false;
 
 	static LayoutParams buttonParams;
 
@@ -157,22 +160,23 @@ public class DedicatedActivity extends Activity {
 
 	private void printText(String str)
 	{
-		TextView line = new TextView(this);
-		line.setText(str);
+		//TextView line = new TextView(this);
+		//line.setText(str);
+		ConsoleView line = new ConsoleView(this);
+		line.addString(str);
 		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		if(output.getChildCount() > 1024)
 			output.removeViewAt(0);
 
 		output.addView(line);
 		if( !isScrolling )
-			scroll.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						scroll.fullScroll(ScrollView.FOCUS_DOWN);
-						isScrolling = false;
-					}
-				}, 200);
-
+		scroll.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				scroll.fullScroll(ScrollView.FOCUS_DOWN);
+				isScrolling = false;
+			}
+		}, 200);
 		isScrolling = true;
 		//croll.fullScroll(ScrollView.FOCUS_DOWN);
 	}
@@ -196,9 +200,11 @@ public class DedicatedActivity extends Activity {
 		argsString = mPref.getString("argv","-dev 5 -dll dlls/hl.dll");
 		cmdArgs.setText(argsString);
 		gamePath = mPref.getString("basedir","/sdcard/xash");
+		isNewBinary = mPref.getBoolean("newxash", false);
 		baseDir.setText(gamePath);
 		if (translatorSelector != null)
 			if (mPref.getInt("translator", 0) < translatorSelector.getCount()) translatorSelector.setSelection(mPref.getInt("translator", 1));
+		DedicatedStatics.chstr(isNewBinary);
 	}
 
 	private void pushLauncherSettings() 
@@ -218,6 +224,7 @@ public class DedicatedActivity extends Activity {
 		SharedPreferences.Editor editor = mPref.edit();
 		editor.putString("argv", argsString);
 		editor.putString("basedir", gamePath);
+		editor.putBoolean("newxash", isNewBinary);
 		if (translatorSelector != null) editor.putInt("translator", translatorSelector.getSelectedItemPosition());
 		try {
 			editor.putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
@@ -260,13 +267,30 @@ public class DedicatedActivity extends Activity {
 		baseDir = new EditText(this);
 		baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		baseDir.setSingleLine();
+
 		baseDir.setOnLongClickListener(new BaseDirPickListener());
+
+		cmdLine = new EditText(this);
+		cmdLine.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		cmdLine.setSingleLine();
+		cmdLine.setHint(R.string.h_cmd);
+		cmdLine.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override 
+			public boolean onLongClick(View v)
+			{
+				sendCommand(cmdLine.getText().toString());
+				cmdLine.setText("");
+				return true;
+			}
+		});
 
 		LinearLayout button_bar = new LinearLayout(this);
 		button_bar.setOrientation(LinearLayout.HORIZONTAL);
 		button_bar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		startButton = new Button(this);
 		scroll = new ScrollView(this);
+		scroll.setBackgroundColor(Color.BLACK);
+		scroll.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.MATCH_PARENT));
 		Button externalPicker = new Button(this);
 
 		externalPicker.setText(R.string.b_sd);
@@ -352,6 +376,7 @@ public class DedicatedActivity extends Activity {
 		//button_bar.addView(externalPicker);
 		if (isXashInstalled()) button_bar.addView(launchXash);
 		launcher.addView(button_bar);
+		launcher.addView(cmdLine);
 		scroll.addView(output);
 		launcher.addView(scroll);
 
@@ -517,6 +542,7 @@ public class DedicatedActivity extends Activity {
 		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_refresh_cache);
 		menu.add(Menu.NONE, 3, Menu.NONE, R.string.b_about);
 		menu.add(Menu.NONE, 4, Menu.NONE, R.string.b_scut);
+		menu.add(Menu.NONE, 5, Menu.NONE, R.string.b_newxash).setCheckable(true).setChecked(isNewBinary);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -550,6 +576,12 @@ public class DedicatedActivity extends Activity {
 				return true;
 			case 4:
 				createShortcut();
+				return true;
+			case 5:
+				item.setChecked(!item.isChecked());
+				isNewBinary = item.isChecked();
+				DedicatedStatics.chstr(isNewBinary);
+				saveSettings();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -736,7 +768,7 @@ public class DedicatedActivity extends Activity {
 		in.close();
 		printText("[OK]\n");
 	}
-
+	
 	public void unpackAssets()
 	{
 		File f = new File(filesDir+"/xash");
@@ -756,10 +788,12 @@ public class DedicatedActivity extends Activity {
 				unpackAsset("tracker");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 				unpackAsset("qemu-i386-static");
-
+				
+				unpackAsset("xash-old");
+				
 				printText("[OK]\nSetting permissions.\n");
 				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static ").waitFor();
+				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static "+filesDir+"/xash-old ").waitFor();
 			}
 		} catch (Exception e) {}
 	}
@@ -808,18 +842,6 @@ public class DedicatedActivity extends Activity {
 			});
 	}
 
-	public void refreshCache()
-	{
-		File dir = new File(filesDir);
-		File[] oldAssets = dir.listFiles();
-
-		printText("\nRefreshing...");
-		if (oldAssets != null) for (File f : oldAssets) 
-				if (f.delete()) printText("Successfuly removed "+f.getName());
-		printText("");
-		unpackAssets();
-	}
-	
 	private void createShortcut()
 	{
 		getIcon();
@@ -878,5 +900,26 @@ public class DedicatedActivity extends Activity {
 		canvas.drawBitmap(Bitmap.createScaledBitmap(background, icon.getWidth()/2, icon.getHeight()/2, true), 0, 0, null);
 		
 		gameIcon = result;
+	}
+	
+	public void refreshCache()
+	{
+		File dir = new File(filesDir);
+		File[] oldAssets = dir.listFiles();
+		
+		printText("\nRefreshing...");
+		if (oldAssets != null) for (File f : oldAssets) 
+			if (f.delete()) printText("Successfuly removed "+f.getName());
+		printText("");
+		unpackAssets();
+	}
+	
+	public void sendCommand(String s)
+	{
+		if ((!s.equals(""))&&DedicatedService.isStarted)
+		{
+			DedicatedService.sendCmd(s);
+			printText("/> "+s);
+		}
 	}
 }

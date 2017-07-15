@@ -10,7 +10,8 @@ fi
 chmod 777 $1/ubt
 cd $3
 export S1="$1"
+export S4="$4"
 shift
 shift
 shift
-$S1/ubt --simd-f32-scalar-vfp --vpaths-list /dev/null --no-vfs-sanity-checks --vfs-kind host-first --vfs-hacks= --fork-controller lo:10010 -- $S1/xash_sse2 $* 2>&1
+$S1/ubt --simd-f32-scalar-vfp --vpaths-list /dev/null --no-vfs-sanity-checks --vfs-kind host-first --vfs-hacks= --fork-controller lo:10010 -- $S1/$S4 $* 2>&1

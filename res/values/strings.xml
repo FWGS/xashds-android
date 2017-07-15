@@ -20,6 +20,8 @@
 	
 	<string name="b_scut">Create shortcut</string>
 	
+	<string name="b_newxash">Use new binary</string>
+	
 	<string name="b_close">Close</string>
 	
 	<string name="b_select">Select...</string>
@@ -48,6 +50,7 @@
 	<string name="h_map">For example: crossfire</string>
 	<string name="h_dlls">For example: dlls/decay.dll</string>
 	<string name="h_game">For example: gearbox; decay</string>
+	<string name="h_cmd">Long tap to send</string>
 
 	<string name="v_isdev">Is developer mode on:</string>
 	<string name="v_isconsole">Is console on:</string>
