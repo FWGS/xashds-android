@@ -113,7 +113,8 @@ public class DedicatedActivity extends Activity {
 					"public",
 					"kick",
 					"exit",
-					"sv_gravity"
+					"sv_gravity",
+					"map"
 			};
 
 	@Override
