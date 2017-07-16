@@ -5,11 +5,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.content.Intent;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.CheckBox;
@@ -49,7 +52,7 @@ public class DedicatedActivity extends Activity {
 	//views for launcher screen
 	static EditText cmdArgs;
 	static EditText baseDir;
-	static EditText cmdLine;
+	static AutoCompleteTextView cmdLine;
 	static LinearLayout output;
 	static ScrollView scroll;
 	static Spinner translatorSelector;
@@ -95,7 +98,25 @@ public class DedicatedActivity extends Activity {
 
 	private MenuItem launcherItem;
 
-    @Override
+	private static String[] commands =
+			{
+					"say",
+					"echo",
+					"sv_cheats",
+					"maxplayers",
+					"hostname",
+					"restart",
+					"ip",
+					"rcon_password",
+					"dethmatch",
+					"coop",
+					"public",
+					"kick",
+					"exit",
+					"sv_gravity"
+			};
+
+	@Override
     protected void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
@@ -271,7 +292,7 @@ public class DedicatedActivity extends Activity {
 
 		baseDir.setOnLongClickListener(new BaseDirPickListener());
 
-		cmdLine = new EditText(this);
+		cmdLine = new AutoCompleteTextView(this);
 		cmdLine.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		cmdLine.setSingleLine();
 		cmdLine.setHint(R.string.h_cmd);
@@ -284,6 +305,22 @@ public class DedicatedActivity extends Activity {
 				return true;
 			}
 		});
+		cmdLine.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		cmdLine.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if ((actionId == EditorInfo.IME_ACTION_DONE) || (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+				{
+					sendCommand(cmdLine.getText().toString());
+					cmdLine.setText("");
+					return true;
+				} else {
+					return false;
+				}
+			}
+		});
+		cmdLine.setThreshold(1);
+		cmdLine.setAdapter(new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice, commands));
 
 		LinearLayout button_bar = new LinearLayout(this);
 		button_bar.setOrientation(LinearLayout.HORIZONTAL);
