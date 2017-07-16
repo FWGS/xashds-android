@@ -22,6 +22,8 @@
 	
 	<string name="b_close">Закрыть</string>
 
+	<string name="b_newxash">Новый XashDS</string>
+	
 	<string name="b_select">Выбор...</string>
 	
 	<string name="b_start_xash">Подключиться к игре...</string>

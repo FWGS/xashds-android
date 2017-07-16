@@ -43,6 +43,7 @@ import java.util.*;
 import android.view.View.*;
 import android.graphics.*;
 import java.io.*;
+import java.net.*;
 
 public class DedicatedActivity extends Activity {
 	//views for launcher screen
@@ -918,8 +919,37 @@ public class DedicatedActivity extends Activity {
 	{
 		if ((!s.equals(""))&&DedicatedService.isStarted)
 		{
-			DedicatedService.sendCmd(s);
+			//DedicatedService.sendCmd(s);
+			try { sendRconCommand("localhost", 27015, CommandParser.parseSingleParameter(argsString, "+rcon_password"), s); } catch (Exception e) {}
 			printText("/> "+s);
 		}
+	}
+	
+	public static void sendRconCommand(String ip, int port, String password, String command) throws Exception
+	{
+		byte[] header = new byte[]{(byte)255, (byte)255, (byte)255, (byte)255};
+		String input = "rcon " + password + " " + command;
+		byte[] sendData = new byte[1024];
+
+		//fill first packet bytes
+		for (int i = 0; i < header.length; i++)
+		{
+			sendData[i] = header[i];
+		}
+
+		//fill the message
+		for (int i = header.length; (i < 1024)&&(i < header.length+input.length()); i++)
+		{
+			sendData[i] = (byte) input.charAt(i-header.length);
+		}
+
+		//send command
+		DatagramSocket s = new DatagramSocket();
+
+		InetAddress addr = InetAddress.getByName(ip);
+
+		DatagramPacket pack = new DatagramPacket(sendData, sendData.length, addr, port);
+		s.send(pack);
+		s.close();
 	}
 }
