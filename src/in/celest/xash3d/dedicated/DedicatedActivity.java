@@ -306,11 +306,11 @@ public class DedicatedActivity extends Activity {
 				return true;
 			}
 		});
-		cmdLine.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		cmdLine.setImeOptions(EditorInfo.IME_ACTION_SEND);
 		cmdLine.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if ((actionId == EditorInfo.IME_ACTION_DONE) || (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
+				if ((actionId == EditorInfo.IME_ACTION_SEND) || (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
 				{
 					sendCommand(cmdLine.getText().toString());
 					cmdLine.setText("");
