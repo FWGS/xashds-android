@@ -1,5 +1,6 @@
 # XashDS Android - fork of FWGS's *xashds-android*
 Android dedicated server with x86 dynamic translator and dll support [**custom modification**].
+![Logo](res/drawable/logo.png)
 ## Current version - v1.2-forked
 ### Current changes since mittorn's version:
 
