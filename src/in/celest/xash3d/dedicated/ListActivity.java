@@ -32,7 +32,7 @@ public class ListActivity extends Activity {
 
 	public static final String REQUEST_GAME_SELECT = "";
 	public static final String REQUEST_BASEDIR_SELECT = "basedir";
-	public static final String REQUEST_MAP_SELECT = "map";
+	public static final String REQUEST_MAP_SELECT = "maps";
 	public static final String REQUEST_DLL_SELECT = "dlls";
 
     @Override

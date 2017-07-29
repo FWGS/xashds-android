@@ -140,6 +140,7 @@ public class DedicatedService extends Service {
                 process = null;
                 killAll(filesDir+"/qemu-i386-static");
                 killAll(filesDir+"/tracker");
+				killAll(filesDir+"/is3g1g");
                 killAll(filesDir+"/ubt");
                 printText("\nKilling existing server!\n");
                 return;
