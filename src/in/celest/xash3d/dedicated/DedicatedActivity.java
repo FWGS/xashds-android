@@ -542,13 +542,13 @@ public class DedicatedActivity extends Activity {
 		//master.addView(saveButton);
 		master.addView(gameNameView);
 		master.addView(modDir);
-		master.addView(makeListButton("", R.string.b_select));
+		master.addView(makeListButton(ListActivity.REQUEST_GAME_SELECT, R.string.b_select));
 		master.addView(gameDllsView);
 		master.addView(serverDlls);
-		master.addView(makeListButton("dlls", R.string.b_select));
+		master.addView(makeListButton(ListActivity.REQUEST_DLL_SELECT, R.string.b_select));
 		master.addView(gameMapView);
 		master.addView(serverMap);
-		master.addView(makeListButton("maps", R.string.b_select));
+		master.addView(makeListButton(ListActivity.REQUEST_MAP_SELECT, R.string.b_select));
 		master.addView(serverPassView);
 		master.addView(rconPass);
 		master.addView(devBox);
