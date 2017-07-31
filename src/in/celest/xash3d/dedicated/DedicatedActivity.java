@@ -1,52 +1,20 @@
 package in.celest.xash3d.dedicated;
 
-import android.app.Activity;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.content.Intent;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.ScrollView;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.Button;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
-import android.widget.Spinner;
-
-//import android.content.Context;
-import android.content.ComponentName;
-import android.content.pm.PackageManager;
-import android.content.SharedPreferences;
-import android.content.res.AssetManager;
-import android.widget.Toast;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.List;
-import java.util.ArrayList;
-import android.os.Environment;
-import java.util.*;
-import android.view.View.*;
+import android.app.*;
+import android.content.*;
+import android.content.pm.*;
+import android.content.res.*;
 import android.graphics.*;
+import android.os.*;
+import android.view.*;
+import android.view.inputmethod.*;
+import android.widget.*;
+import android.widget.LinearLayout.*;
 import java.io.*;
 import java.net.*;
+import java.util.*;
+
+import java.lang.Process;
 
 public class DedicatedActivity extends Activity {
 	//views for launcher screen
@@ -130,8 +98,12 @@ public class DedicatedActivity extends Activity {
 		if (DedicatedStatics.launched != null) DedicatedStatics.launched.finish();
 		DedicatedStatics.launched = this;
 
-		if (tab) initLauncher();
-		else initMaster();
+		try {if (tab) initLauncher();
+		else initMaster();}
+		catch (Exception e)
+		{
+			Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+		}
 		
 		if(getIntent().getBooleanExtra("autostart", false))
 		{
@@ -263,40 +235,24 @@ public class DedicatedActivity extends Activity {
 		setTitle(R.string.launcher_head);
 
 		filesDir = getApplicationContext().getFilesDir().getPath();
+		
+
+		setContentView(R.layout.launcher_layout);
 		// Build layout
-		LinearLayout launcher = new LinearLayout(this);
-		launcher.setOrientation(LinearLayout.VERTICAL);
-		launcher.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		TextView titleView = new TextView(this);
-		titleView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		titleView.setText(R.string.l_args);
-		titleView.setTextAppearance(this, android.R.attr.textAppearanceLarge);
-		TextView titleView2 = new TextView(this);
-		titleView2.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		titleView2.setText(R.string.l_path);
-		titleView2.setTextAppearance(this, android.R.attr.textAppearanceLarge);
-		output = new LinearLayout(this);
-		output.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		output.setOrientation(LinearLayout.VERTICAL);
+		output = (LinearLayout) findViewById(R.id.logOutput);
+		scroll = (ScrollView) findViewById(R.id.logScroll);
 
 		for (int i = 0; i < DedicatedStatics.logView.size(); i++)
 		{
 			printText(DedicatedStatics.logView.get(i));
 		}
 
-		cmdArgs = new EditText(this);
-		cmdArgs.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		cmdArgs.setSingleLine();
-		baseDir = new EditText(this);
-		baseDir.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		baseDir.setSingleLine();
+		cmdArgs = (EditText) findViewById(R.id.cmdArgs);
+		baseDir = (EditText) findViewById(R.id.baseDir);
 
 		baseDir.setOnLongClickListener(new BaseDirPickListener());
 
-		cmdLine = new AutoCompleteTextView(this);
-		cmdLine.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		cmdLine.setSingleLine();
-		cmdLine.setHint(R.string.h_cmd);
+		cmdLine = (AutoCompleteTextView) findViewById(R.id.cmdLine);
 		cmdLine.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override 
 			public boolean onLongClick(View v)
@@ -323,33 +279,9 @@ public class DedicatedActivity extends Activity {
 		cmdLine.setThreshold(1);
 		cmdLine.setAdapter(new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice, commands));
 
-		LinearLayout button_bar = new LinearLayout(this);
-		button_bar.setOrientation(LinearLayout.HORIZONTAL);
-		button_bar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		startButton = new Button(this);
-		scroll = new ScrollView(this);
-		scroll.setBackgroundColor(Color.BLACK);
-		scroll.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.MATCH_PARENT));
-		Button externalPicker = new Button(this);
-
-		externalPicker.setText(R.string.b_sd);
-		externalPicker.setLayoutParams(buttonParams);
-		externalPicker.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					printText("Trying to access...");
-
-					Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-					startActivityForResult(intent, 42);
-
-					initLauncher();
-				}
-			});
-		externalPicker.setEnabled(false);
-
-		launchXash = new Button(this);
-		launchXash.setText(R.string.b_start_xash);
-		launchXash.setLayoutParams(buttonParams);
+		startButton = (Button) findViewById(R.id.startButton);
+		
+		launchXash = (Button) findViewById(R.id.startXash);
 		launchXash.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -360,7 +292,6 @@ public class DedicatedActivity extends Activity {
 
 		// Set launch button title here
 		startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
-		startButton.setLayoutParams(buttonParams);
 		startButton.setOnClickListener( new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -377,22 +308,18 @@ public class DedicatedActivity extends Activity {
 					}
 				}
 			});
-		launcher.addView(titleView);
-		launcher.addView(cmdArgs);
-		launcher.addView(titleView2);
-		launcher.addView(baseDir);
 		// Add other options here
 		if(System.getProperty("ro.product.cpu.abi") == "x86")
 			translator = "none";
 		else
 		{
+			translatorSelector = (Spinner) findViewById(R.id.translatorSelector);
 			final String[] list = listTranslators();
 			if(list.length > 1)
 			{
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 																		android.R.layout.simple_spinner_dropdown_item, list);
 				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-				translatorSelector = new Spinner(this);
 				translatorSelector.setAdapter(adapter);
 				translatorSelector.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 				translatorSelector.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
@@ -407,21 +334,15 @@ public class DedicatedActivity extends Activity {
 						}
 
 					});
-				launcher.addView(translatorSelector);
+			} else {
+				translatorSelector.setVisibility(View.INVISIBLE);
 			}
 		}
-		button_bar.addView(startButton);
-		//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  //SD card pick API enabled on 5.0(v21) and higher
-		//button_bar.addView(externalPicker);
-		if (isXashInstalled()) button_bar.addView(launchXash);
-		launcher.addView(button_bar);
-		launcher.addView(cmdLine);
-		scroll.addView(output);
-		launcher.addView(scroll);
-
+		if (!isXashInstalled()) launchXash.setVisibility(View.INVISIBLE);
+		
 		loadSettings();
 
-		setContentView(launcher);
+		//setContentView(launcher);
 
 		getActionBar().setDisplayHomeAsUpEnabled(false);
 	}

@@ -1,19 +1,16 @@
 package in.celest.xash3d.dedicated;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.widget.ScrollView;
-import android.widget.Scroller;
-import android.widget.TextView;
-import android.widget.*;
-import android.widget.LinearLayout.LayoutParams;
-
-import java.io.File;
-import android.view.*;
-import android.view.View.*;
+import android.app.*;
 import android.content.*;
 import android.graphics.*;
+import android.os.*;
+import android.view.*;
+import android.view.View.*;
+import android.widget.*;
+import android.widget.LinearLayout.*;
+import java.io.*;
+
+import android.view.View.OnClickListener;
 
 /**
  * Created by Greg on 13.03.2017.
