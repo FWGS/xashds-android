@@ -229,6 +229,8 @@ public class DedicatedActivity extends Activity {
 		printText("Settings saved!");
 	}
 
+	//Launcher initialization
+	//Called on activity start and on maser close
 	private void initLauncher()
 	{
 		tab = true;
@@ -238,18 +240,20 @@ public class DedicatedActivity extends Activity {
 		
 
 		setContentView(R.layout.launcher_layout);
-		// Build layout
+		
+		//Init layout
 		output = (LinearLayout) findViewById(R.id.logOutput);
 		scroll = (ScrollView) findViewById(R.id.logScroll);
-
+		
+		//Fill log in already exists
 		for (int i = 0; i < DedicatedStatics.logView.size(); i++)
 		{
 			printText(DedicatedStatics.logView.get(i));
 		}
 
 		cmdArgs = (EditText) findViewById(R.id.cmdArgs);
+		
 		baseDir = (EditText) findViewById(R.id.baseDir);
-
 		baseDir.setOnLongClickListener(new BaseDirPickListener());
 
 		cmdLine = (AutoCompleteTextView) findViewById(R.id.cmdLine);
@@ -263,7 +267,7 @@ public class DedicatedActivity extends Activity {
 			}
 		});
 		cmdLine.setImeOptions(EditorInfo.IME_ACTION_SEND);
-		cmdLine.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+		cmdLine.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if ((actionId == EditorInfo.IME_ACTION_SEND) || (event.getKeyCode() == KeyEvent.KEYCODE_ENTER))
@@ -278,8 +282,6 @@ public class DedicatedActivity extends Activity {
 		});
 		cmdLine.setThreshold(1);
 		cmdLine.setAdapter(new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice, commands));
-
-		startButton = (Button) findViewById(R.id.startButton);
 		
 		launchXash = (Button) findViewById(R.id.startXash);
 		launchXash.setOnClickListener(new View.OnClickListener() {
@@ -290,6 +292,7 @@ public class DedicatedActivity extends Activity {
 			});
 		launchXash.setEnabled(DedicatedService.canConnect);
 
+		startButton = (Button) findViewById(R.id.startButton);
 		// Set launch button title here
 		startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 		startButton.setOnClickListener( new View.OnClickListener() {
@@ -308,7 +311,8 @@ public class DedicatedActivity extends Activity {
 					}
 				}
 			});
-		// Add other options here
+			
+		//init translator list
 		if(System.getProperty("ro.product.cpu.abi") == "x86")
 			translator = "none";
 		else
@@ -338,11 +342,10 @@ public class DedicatedActivity extends Activity {
 				translatorSelector.setVisibility(View.INVISIBLE);
 			}
 		}
+		
 		if (!isXashInstalled()) launchXash.setVisibility(View.INVISIBLE);
 		
 		loadSettings();
-
-		//setContentView(launcher);
 
 		getActionBar().setDisplayHomeAsUpEnabled(false);
 	}

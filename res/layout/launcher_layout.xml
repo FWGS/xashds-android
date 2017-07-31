@@ -14,6 +14,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:maxLines="1"
+		android:inputType="text"
 		android:id="@+id/cmdArgs"/>
 
 	<TextView
@@ -25,6 +26,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:maxLines="1"
+		android:inputType="text"
 		android:id="@+id/baseDir"/>
 
 	<Spinner
@@ -54,6 +56,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:maxLines="1"
+		android:inputType="text"
 		android:id="@+id/cmdLine"
 		android:hint="@string/h_cmd"/>
 
