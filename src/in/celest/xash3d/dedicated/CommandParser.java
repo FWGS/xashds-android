@@ -53,6 +53,59 @@ public class CommandParser {
         return ret;
     }
 
+    public static int paramCount(String args, String param)
+    {
+        if (args.lastIndexOf(param) == -1) return 0;
+            else
+            {
+                int i = 0;
+                for (i = args.indexOf(param); i >= 0; i = args.indexOf(param, i));
+                return i;
+            }
+    }
+
+    public static String removeAll(String args, String param)
+    {
+        for (int i = args.indexOf(param); i >= 0; i = args.indexOf(param, i)) {
+            int j = i;
+            boolean f = true;
+            while (j < args.length())
+            {
+                if (args.charAt(j) == ' ')
+                    if (j < args.length()-1) { if ((args.charAt(j+1) != '+')&&(args.charAt(j+1) != '-')) if (f) f = false; else break; }
+                        else  if (f) f = false; else break;
+
+                j++;
+            }
+            args = args.replace(args.substring(i, j), "");
+        }
+
+        return format(args);
+    }
+
+    public static String format(String args)
+    {
+        String ret = "";
+        for (int i = 0; i < args.length(); i++)
+        {
+            char c = args.charAt(i);
+            if (i == 0)
+            {
+                if (c != ' ') ret += c;
+            } else {
+                if (!((c == ' ') && (args.charAt(i-1) == ' '))) ret += c;
+            }
+        }
+        return ret;
+    }
+
+    public static String addParam(String args, String param)
+    {
+        if (args.charAt(args.length() - 1) != ' ')  args += " ";
+        args += param;
+        return format(args);
+    }
+
     public static String wordFrom(String in, int index) {
         String ret = "";
         for (int i = index; (i < in.length())&&(in.charAt(i) != ' '); i++) {

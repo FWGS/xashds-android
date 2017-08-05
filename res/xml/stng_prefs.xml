@@ -19,5 +19,40 @@
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/b_master">
+		<EditTextPreference
+			android:key="argv"
+			android:title="@string/l_args"
+			/>
+		<Preference
+			android:key="s_game"
+			android:title="@string/l_game"
+			/>
+		<Preference
+			android:key="s_dll"
+			android:title="@string/l_dlls"
+			android:summary="@string/l_dlls_sm"
+			/>
+		<Preference
+			android:key="s_map"
+			android:title="@string/l_map"
+			/>
+		<CheckBoxPreference
+			android:key="s_dev"
+			android:title="@string/v_isdev"
+			/>
+		<CheckBoxPreference
+			android:key="s_console"
+			android:title="@string/v_isconsole"
+			/>
+		<CheckBoxPreference
+			android:key="s_log"
+			android:defaultValue="false"
+			android:title="@string/v_islog"
+			android:enabled="false"
+			/>
+		<CheckBoxPreference
+			android:key="s_coop"
+			android:title="Enable coop"
+			/>
 	</PreferenceCategory>
 </PreferenceScreen>
