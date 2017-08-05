@@ -80,7 +80,7 @@ public class ListActivity extends Activity {
 
         mainlayout.addView(header);
 
-		String game = CommandParser.parseSingleParameter(DedicatedActivity.argsString, "-game");
+		String game = CommandParser.parseSingleParameter(getSharedPreferences("dedicated", 0).getString("argv", "-dev 5 -dll dlls/hl.dll"), "-game");
 		if (game.equals("")) game = "valve";
 
 		//setting up paths

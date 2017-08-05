@@ -26,12 +26,13 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 				putBoolean("s_log", CommandParser.parseLogicParameter(argv, "-log")).
 				putBoolean("s_coop", CommandParser.parseLogicParameter(argv, "+coop")).
 				putString("s_dll", CommandParser.parseMultipleParameter(argv, "-dll")).
+                putString("s_game", CommandParser.parseSingleParameter(argv, "-game")).
+				putString("s_map", CommandParser.parseSingleParameter(argv, "+map")).
 				commit();
 		
 		addPreferencesFromResource(R.xml.stng_prefs);
 		
-		Preference based = findPreference("basedir");
-		based.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+		findPreference("basedir").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference p1)
 			{
@@ -43,12 +44,30 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 			}
 		});
 
-		Preference dlls = findPreference("s_dll");
-		dlls.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        findPreference("s_game").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent newi = new Intent(SettingsActivity.this, ListActivity.class);
+                newi.putExtra("folder", ListActivity.REQUEST_GAME_SELECT);
+                startActivityForResult(newi, 1998);
+                return true;
+            }
+        });
+		findPreference("s_dll").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference p1) {
 				Intent newi = new Intent(SettingsActivity.this, ListActivity.class);
 				newi.putExtra("folder", ListActivity.REQUEST_DLL_SELECT);
+				startActivityForResult(newi, 1998);
+				return true;
+			}
+		});
+
+		findPreference("s_map").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				Intent newi = new Intent(SettingsActivity.this, ListActivity.class);
+				newi.putExtra("folder", ListActivity.REQUEST_MAP_SELECT);
 				startActivityForResult(newi, 1998);
 				return true;
 			}
@@ -85,21 +104,29 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 						getSharedPreferences("dedicated", 0).edit().putString("s_dll", dlls).putString("argv", argv).commit();
 						((EditTextPreference) findPreference("argv")).setText(argv);
 						break;
-					/*case "maps":
-						serverMap.setText(result);
-						pushMasterSettings();
-						break;*/
+					case ListActivity.REQUEST_MAP_SELECT:
+						argv = CommandParser.addParam(CommandParser.removeAll(argv, "+map"), "+map "+result);
+						getSharedPreferences("dedicated", 0).edit().putString("s_map", result).putString("argv", argv).commit();
+						((EditTextPreference) findPreference("argv")).setText(argv);
+						break;
 					case ListActivity.REQUEST_BASEDIR_SELECT:
 						getSharedPreferences("dedicated", 0).edit().putString("basedir", result).commit();
 						break;
-					/*case "":
-						if (!modDir.getText().toString().equals(result)) {
-							serverDlls.setText("");
-							serverMap.setText("");
+					case ListActivity.REQUEST_GAME_SELECT:
+						if (!((result == CommandParser.parseSingleParameter(argv, "+map")) ||
+								(result.equals("valve") && (CommandParser.parseSingleParameter(argv, "+map") == ""))))	//if not current set game
+						{
+							//clean other game parameters
+							argv = CommandParser.removeAll(CommandParser.removeAll(argv, "+map"), "-dll");
+							if (!result.equals("valve")) {
+								argv = CommandParser.addParam(CommandParser.removeAll(argv, "-game"), "-game " + result);
+							} else {
+								argv = CommandParser.removeAll(argv, "-game");
+							}
+							getSharedPreferences("dedicated", 0).edit().putString("s_game", result.equals("valve") ? "" : result).putString("argv", argv).commit();
+							((EditTextPreference) findPreference("argv")).setText(argv);
 						}
-						modDir.setText((result.equals("valve"))?"":result);
-						pushMasterSettings();
-						break;*/
+						break;
 				}
 		}
 				
@@ -127,6 +154,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 						putBoolean("s_log", CommandParser.parseLogicParameter(argv, "-log")).
 						putBoolean("s_coop", CommandParser.parseLogicParameter(argv, "+coop")).
 						putString("s_dll", CommandParser.parseMultipleParameter(argv, "-dll")).
+                        putString("s_game", CommandParser.parseSingleParameter(argv, "-game")).
+						putString("s_map", CommandParser.parseSingleParameter(argv, "+map")).
 						commit();
 				break;
 			case "s_console":
