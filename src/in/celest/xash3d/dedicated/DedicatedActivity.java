@@ -14,7 +14,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import java.lang.Process;
+import android.os.Process;
 
 public class DedicatedActivity extends Activity {
 	//views for launcher screen
@@ -25,6 +25,7 @@ public class DedicatedActivity extends Activity {
 	static ScrollView scroll;
 	static Spinner translatorSelector;
 	static Button startButton;
+	
 	//views for server master screen
 	static EditText modDir;
 	static EditText serverDlls;
@@ -124,7 +125,7 @@ public class DedicatedActivity extends Activity {
 		}
 	}
 
-    private String[] listTranslators()
+    public static String[] listTranslators()
     {
 		try
 		{
@@ -198,7 +199,7 @@ public class DedicatedActivity extends Activity {
 		isNewBinary = mPref.getBoolean("newxash", false);
 		baseDir.setText(gamePath);
 		if (translatorSelector != null)
-			if (mPref.getInt("translator", 0) < translatorSelector.getCount()) translatorSelector.setSelection(mPref.getInt("translator", 1));
+			if (Integer.valueOf(mPref.getString("translator", "0")) < translatorSelector.getCount()) translatorSelector.setSelection(Integer.valueOf(mPref.getString("translator", "0")));
 		DedicatedStatics.chstr(isNewBinary);
 	}
 
@@ -219,8 +220,7 @@ public class DedicatedActivity extends Activity {
 		SharedPreferences.Editor editor = mPref.edit();
 		editor.putString("argv", argsString);
 		editor.putString("basedir", gamePath);
-		editor.putBoolean("newxash", isNewBinary);
-		if (translatorSelector != null) editor.putInt("translator", translatorSelector.getSelectedItemPosition());
+		if (translatorSelector != null) editor.putString("translator", String.valueOf(translatorSelector.getSelectedItemPosition()));
 		try {
 			editor.putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
 		} catch (Exception e) {}
@@ -505,7 +505,7 @@ public class DedicatedActivity extends Activity {
 		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_refresh_cache);
 		menu.add(Menu.NONE, 3, Menu.NONE, R.string.b_about);
 		menu.add(Menu.NONE, 4, Menu.NONE, R.string.b_scut);
-		menu.add(Menu.NONE, 5, Menu.NONE, R.string.b_newxash).setCheckable(true).setChecked(isNewBinary);
+		menu.add(Menu.NONE, 5, Menu.NONE, R.string.b_settings);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -541,10 +541,7 @@ public class DedicatedActivity extends Activity {
 				createShortcut();
 				return true;
 			case 5:
-				item.setChecked(!item.isChecked());
-				isNewBinary = item.isChecked();
-				DedicatedStatics.chstr(isNewBinary);
-				saveSettings();
+				startActivity(new Intent(DedicatedActivity.this, SettingsActivity.class));
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -624,6 +621,13 @@ public class DedicatedActivity extends Activity {
 	{
 		saveSettings();
 		super.onPause();
+	}
+
+	@Override
+	protected void onResume()
+	{
+		loadSettings();
+		super.onResume();
 	}
 
 	public class ListViewOpener implements View.OnClickListener

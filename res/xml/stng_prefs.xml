@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory
+		android:title="App settings">
+		<Preference
+			android:key="basedir"
+			android:summary="Game files directory"
+			android:title="Base directory"
+			/>
+		<CheckBoxPreference
+			android:key="newxash"
+			android:title="Use new XashDS"
+			android:summary="Experimemtal new XashDS 0.19 binary"/>
+		<ListPreference
+			android:key="translator"
+			android:title="Select translator"
+			/>
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="@string/b_master">
+	</PreferenceCategory>
+</PreferenceScreen>
