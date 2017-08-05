@@ -80,21 +80,21 @@ public class ListActivity extends Activity {
 
         mainlayout.addView(header);
 
-		String game = CommandParser.parseSingleParameter(getSharedPreferences("dedicated", 0).getString("argv", "-dev 5 -dll dlls/hl.dll"), "-game");
+		String game = DedicatedStatics.getGame(this);
 		if (game.equals("")) game = "valve";
 
 		//setting up paths
 		switch (folder)
 		{
 			case REQUEST_GAME_SELECT:
-				filePath = DedicatedActivity.gamePath;
+				filePath = DedicatedStatics.getBaseDir(this);
 				relativePath = "";
 				break;
 			case REQUEST_BASEDIR_SELECT:
 				filePath = getIntent().getStringExtra("dir");
 				break;
 			default:
-				filePath = makeDir(DedicatedActivity.gamePath, game, folder);
+				filePath = makeDir(DedicatedStatics.getBaseDir(this), game, folder);
 				relativePath = folder + "/";
 				break;
 		}

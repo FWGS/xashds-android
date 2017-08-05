@@ -113,8 +113,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 						getSharedPreferences("dedicated", 0).edit().putString("basedir", result).commit();
 						break;
 					case ListActivity.REQUEST_GAME_SELECT:
-						if (!((result == CommandParser.parseSingleParameter(argv, "+map")) ||
-								(result.equals("valve") && (CommandParser.parseSingleParameter(argv, "+map") == ""))))	//if not current set game
+						if (!((result.equals(CommandParser.parseSingleParameter(argv, "-game"))) ||
+								(result.equals("valve") && (CommandParser.parseSingleParameter(argv, "-game").equals("")))))	//if not current set game
 						{
 							//clean other game parameters
 							argv = CommandParser.removeAll(CommandParser.removeAll(argv, "+map"), "-dll");
@@ -123,7 +123,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 							} else {
 								argv = CommandParser.removeAll(argv, "-game");
 							}
-							getSharedPreferences("dedicated", 0).edit().putString("s_game", result.equals("valve") ? "" : result).putString("argv", argv).commit();
+							getSharedPreferences("dedicated", 0).edit().putString("s_game", result.equals("valve") ? "" : result).putString("s_map", "").putString("s_dll", "").putString("argv", argv).commit();
 							((EditTextPreference) findPreference("argv")).setText(argv);
 						}
 						break;

@@ -1,6 +1,7 @@
 package in.celest.xash3d.dedicated;
 import android.widget.*;
 import java.util.*;
+import android.content.*;
 
 public class DedicatedStatics
 {
@@ -31,5 +32,15 @@ public class DedicatedStatics
 			XASH_BINARY = XASH_BINARY_OLD;
 			XASH_BINARY_SSE = XASH_BINARY_SSE_OLD;
 		}
+	}
+	
+	public static String getBaseDir(Context context)
+	{
+		return context.getSharedPreferences("dedicated", 0).getString("basedir", "/sdcard/xash");
+	}
+	
+	public static String getGame(Context context)
+	{
+		return CommandParser.parseSingleParameter(context.getSharedPreferences("dedicated", 0).getString("argv", "-dev 5 -dll dlls/hl.dll"), "-game");
 	}
 }
