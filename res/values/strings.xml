@@ -41,7 +41,7 @@
 	
 	<string name="l_game">Game or mod folder name</string>
 	<string name="l_dlls">Game or mod dlls names (relative to mod root)</string>
-    <string name="l_dlls_sm">Long tap to edit directly</string>
+    <string name="l_dlls_sm">Long tap for interactive menu</string>
 	<string name="l_map">Startup map name</string>
 	<string name="l_rcon">Server control (rcon) password</string>
 	

@@ -66,15 +66,14 @@ public class CommandParser {
 
     public static String removeAll(String args, String param)
     {
-        for (int i = args.indexOf(param); i >= 0; i = args.indexOf(param, i)) {
+        for (int i = args.indexOf(param); i >= 0; i = args.indexOf(param)) {
             int j = i;
             boolean f = true;
             while (j < args.length())
             {
-                if (args.charAt(j) == ' ')
-                    if (j < args.length()-1) { if ((args.charAt(j+1) != '+')&&(args.charAt(j+1) != '-')) if (f) f = false; else break; }
-                        else  if (f) f = false; else break;
-
+                if (j < args.length()-1)
+                    if (args.charAt(j) == ' ')
+                        if (!((args.charAt(j+1) != '+') || (args.charAt(j+1) != '-'))) break;
                 j++;
             }
             args = args.replace(args.substring(i, j), "");
