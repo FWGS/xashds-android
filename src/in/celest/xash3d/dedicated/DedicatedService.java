@@ -91,7 +91,8 @@ public class DedicatedService extends Service {
 				iconRes = R.drawable.logo_error;
 				canConnect = false;
 			}
-		
+
+			canConnect = canConnect && isRunning() && isStarted;
 
 		if (DedicatedStatics.launched != null) { 
 			DedicatedStatics.launched.printLog(str);

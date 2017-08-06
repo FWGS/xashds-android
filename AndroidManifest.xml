@@ -26,7 +26,7 @@
 			android:theme="@style/AppDialog"/>
 		
 		<activity android:name=".AboutActivity"
-            android:label="@string/c_about"
+            android:label="@string/b_about"
             android:exported="true"
 			android:theme="@style/AppDialog"/>
 		
@@ -41,7 +41,7 @@
 			android:theme="@style/AppDialog"/>
 		
 		<activity android:name=".SettingsActivity"
-            android:label="XashDS settings"
+            android:label="@string/master_head"
             android:exported="true">
 			<intent-filter>
                 <action android:name=".ListActivity"/>

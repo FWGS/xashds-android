@@ -30,8 +30,11 @@
 		<Preference
 			android:key="s_dll"
 			android:title="@string/l_dlls"
-			android:summary="@string/l_dlls_sm"
 				/>
+		<Preference
+			android:key="s_remdlls"
+			android:title="@string/l_remdlls"
+			/>
 		<Preference
 			android:key="s_map"
 			android:title="@string/l_map"
@@ -56,11 +59,11 @@
 			/>
 		<CheckBoxPreference
 			android:key="s_coop"
-			android:title="Enable coop"
+			android:title="@string/v_iscoop"
 			/>
 		<CheckBoxPreference
 			android:key="s_public"
-			android:title="Is public server?"
+			android:title="@string/v_ispublic"
 			/>
 	</PreferenceCategory>
 </PreferenceScreen>

@@ -2,20 +2,16 @@
 <resources>
     <string name="l_path">Расположение папки с игрой:</string>
     <string name="l_args">Аргументы командной строки сервера:</string>
-	
-	<string name="launcher_head">XashDS</string>
-	<string name="master_head">Настройщик сервера XashDS</string>
+
+	<string name="master_head">Настройки XashDS</string>
 	
 	<string name="b_start_launch">Старт!</string>
 	<string name="b_start_stop">Стоп!</string>
-	
-	<string name="b_sd">Разрешить RW для внешней SD!</string>
-	
+
 	<string name="b_refresh_cache">Обновить файлы</string>
 	
 	<string name="b_master">Настройщик сервера</string>
-	<string name="b_master_close">Закрыть настройщик</string>
-	
+
 	<string name="b_about">О программе</string>
 
 	<string name="b_scut">Создать ярлык</string>
@@ -32,14 +28,12 @@
 	<string name="b_start_xash_hacks">Использовать xashds hacks</string>
 	
 	<string name="l_notfound">Подходящие файлы не найдены</string>
-	
-	
-	<string name="l_save">Сохранить настройки!</string>
-	
+
+
 	<string name="l_game">Папка с игрой или модом</string>
 	<string name="l_dlls">DLL\'и сервера</string>
 	<string name="l_map">Стартовая карта</string>
-	<string name="l_rcon">Пароль для удалённого (rcon) контроля</string>
+	<string name="l_rcon">Пароль удалённого (rcon) контроля</string>
 	
 	<string name="l_scut_name">Название ярлыка: </string>
 	<string name="l_scut_gamel">Запуск игры после загрузки сервера</string>
@@ -51,13 +45,15 @@
 	<string name="h_game">Например: gearbox; decay</string>
 	<string name="h_cmd">Отправить - долгое нажатие</string>
 
-	<string name="v_isdev">Включить режим разработчика:</string>
-	<string name="v_isconsole">Включить консоль:</string>
+	<string name="v_isdev">Включить режим разработчика</string>
+	<string name="v_isconsole">Включить консоль</string>
 	<string name="v_islog">Включить логгирование:</string>
-	<string name="v_isdm">Режим игры: deathmatch</string>
-	<string name="v_iscoop">Режим игры: кооператив</string>
+	<string name="v_iscoop">Кооперативный режим</string>
 	<string name="v_ispublic">Сервер в Internet</string>
 	<string name="v_islan">Сервер в LAN</string>
 	
 	<string name="t_about1">XashDS Andoid (v1.2-forked)\nОригинальное приложение: mittorn (FWGS team)\nФорк: GregTheMadMonk (Greg)\n\nОсобые благодарности:\n-Дяде Мише за Xash3D\n-FWGS team за Xash3D FWGS и первый XashDS\n-Valve за Half-Life и GoldSrc</string>
+	<string name="pr_basedir">Папка с игрой</string>
+	<string name="b_settings">Настройки...</string>
+	<string name="l_remdlls">Очистить DLL\'и</string>
 </resources>

@@ -27,8 +27,6 @@ public class DedicatedActivity extends Activity {
 	static String filesDir;
 	static boolean isScrolling;
 
-	static String argsString;
-
 	static boolean isNewBinary = false;
 
 	static LayoutParams buttonParams;
@@ -70,7 +68,7 @@ public class DedicatedActivity extends Activity {
         super.onCreate(savedInstanceState);
 
 		buttonParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		buttonParams.gravity = 5;
+		buttonParams.gravity = Gravity.RIGHT;
 
 		isRunned = DedicatedService.isStarted;
 
@@ -284,7 +282,7 @@ public class DedicatedActivity extends Activity {
 	{
 		unpackAssets();
 		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
-		dedicatedServer.putExtra("argv", argsString);
+		dedicatedServer.putExtra("argv", DedicatedStatics.getArgv(this));
 		dedicatedServer.putExtra("path", DedicatedStatics.getBaseDir(this));
 		dedicatedServer.putExtra("translator", DedicatedStatics.getTranslator(this));
 		dedicatedServer.putExtra("files", filesDir);
@@ -306,6 +304,8 @@ public class DedicatedActivity extends Activity {
 	public void stopServer()
 	{
 		autostarted = false;
+		DedicatedService.isStarted = false;
+		DedicatedService.canConnect = false;
 		stopService(new Intent(DedicatedActivity.this, DedicatedService.class));
 	}
 
@@ -405,7 +405,7 @@ public class DedicatedActivity extends Activity {
 						autolaunch = false;
 						if (automode)
 						{
-							String arguments = autostarted?autoArgv:argsString;
+							String arguments = autostarted?autoArgv:DedicatedStatics.getArgv(DedicatedActivity.this);
 
 							String game = CommandParser.parseSingleParameter(arguments, "-game");
 							Intent intent = new Intent();
@@ -419,7 +419,7 @@ public class DedicatedActivity extends Activity {
 						}
 						else
 						{
-							String arguments = autostarted?autoArgv:argsString;
+							String arguments = autostarted?autoArgv:DedicatedStatics.getArgv(DedicatedActivity.this);
 
 							String game = CommandParser.parseSingleParameter(arguments, "-game");
 							Intent intent = new Intent();
@@ -513,7 +513,7 @@ public class DedicatedActivity extends Activity {
 		if ((!s.equals(""))&&DedicatedService.isStarted)
 		{
 			//DedicatedService.sendCmd(s);
-			try { sendRconCommand("localhost", 27015, CommandParser.parseSingleParameter(argsString, "+rcon_password"), s); } catch (Exception e) {}
+			try { sendRconCommand("localhost", 27015, CommandParser.parseSingleParameter(DedicatedStatics.getArgv(this), "+rcon_password"), s); } catch (Exception e) {}
 			printText("/> "+s);
 		}
 	}

@@ -3,19 +3,16 @@
     <string name="l_path">Game folder location:</string>
     <string name="l_args">Server command line arguments:</string>
 	
-	<string name="launcher_head">XashDS</string>
-	<string name="master_head">XashDS server master</string>
+	<string name="launcher_head" translatable="false">XashDS</string>
+	<string name="master_head">XashDS settings</string>
 	
 	<string name="b_start_launch">Start!</string>
 	<string name="b_start_stop">Stop!</string>
 	
-	<string name="b_sd">Enable external SD RW!</string>
-	
 	<string name="b_refresh_cache">Refresh files</string>
 	
 	<string name="b_master">Server master</string>
-	<string name="b_master_close">Close master</string>
-	
+
 	<string name="b_about">About</string>
 	
 	<string name="b_scut">Create shortcut</string>
@@ -32,18 +29,13 @@
 	
 	<string name="b_start_xash_connect">Use \"+connect\"</string>
 	<string name="b_start_xash_hacks">Use xashds hacks</string>
-	
-	<string name="c_about">About XashDS</string>
-	
+
 	<string name="l_notfound">No matching files found</string>
-	
-	<string name="l_save">Save settings!</string>
-	
+
 	<string name="l_game">Game or mod folder</string>
 	<string name="l_dlls">Server DLL\'s</string>
-    <string name="l_dlls_sm">Long tap for interactive menu</string>
 	<string name="l_map">Start map</string>
-	<string name="l_rcon">Server control (rcon) password</string>
+	<string name="l_rcon">Remote control (rcon) password</string>
 	
 	<string name="l_scut_name">Shortcut name: </string>
 	<string name="l_scut_gamel">Launch game after server start</string>
@@ -55,15 +47,15 @@
 	<string name="h_game">For example: gearbox; decay</string>
 	<string name="h_cmd">Long tap to send</string>
 
-	<string name="v_isdev">Is developer mode on:</string>
-	<string name="v_isconsole">Is console on:</string>
+	<string name="v_isdev">Enable developer mode</string>
+	<string name="v_isconsole">Enable console</string>
 	<string name="v_islog">Enable log:</string>
-	<string name="v_isdm">Game mode: deathmatch</string>
-	<string name="v_iscoop">Game mode: coop</string>
+	<string name="v_iscoop">Enable coop</string>
 	<string name="v_ispublic">Internet server</string>
 	<string name="v_islan">LAN server</string>
 
 	<string name="pr_basedir">Game folder location</string>
 
 	<string name="t_about1">XashDS Andoid (v1.2-forked)\nOriginal app by: mittorn (FWGS team)\nFork by: GregTheMadMonk (Greg)\n\nSpecial thanks to:\n-Uncle Mike for Xash3D\n-FWGS team for Xash3D FWGS and first XashDS\n-Valve for Half-Life and GoldSrc</string>
+	<string name="l_remdlls">Clear DLL\'s</string>
 </resources>

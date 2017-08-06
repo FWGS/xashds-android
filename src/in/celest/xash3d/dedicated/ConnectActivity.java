@@ -64,7 +64,7 @@ public class ConnectActivity extends Activity
 	}
 	
 	public void startHacks() {
-		String arguments = DedicatedActivity.autostarted?DedicatedActivity.autoArgv:DedicatedActivity.argsString;
+		String arguments = DedicatedActivity.autostarted?DedicatedActivity.autoArgv:DedicatedStatics.getArgv(this);
 		
 		String game = CommandParser.parseSingleParameter(arguments, "-game");
 		Intent intent = new Intent();
@@ -78,7 +78,7 @@ public class ConnectActivity extends Activity
 	}
 	
 	public void startConnect(){
-		String arguments = DedicatedActivity.autostarted?DedicatedActivity.autoArgv:DedicatedActivity.argsString;
+		String arguments = DedicatedActivity.autostarted?DedicatedActivity.autoArgv:DedicatedStatics.getArgv(this);
 
 		String game = CommandParser.parseSingleParameter(arguments, "-game");
 		Intent intent = new Intent();

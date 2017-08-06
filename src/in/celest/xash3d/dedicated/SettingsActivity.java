@@ -52,6 +52,16 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 			}
 		});
 
+		findPreference("s_remdlls").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				argv = CommandParser.removeAll(argv, "-dll");
+				getSharedPreferences("dedicated", 0).edit().putString("s_dll", "").putString("argv", argv).commit();
+				updateAllPrefs(false);
+				return true;
+			}
+		});
+
 		findPreference("s_map").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
@@ -106,12 +116,10 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 						argv = CommandParser.addParam(CommandParser.removeAll(argv, "-dll"), CommandParser.makeParamArgString(dlls, "-dll"));
 
 						getSharedPreferences("dedicated", 0).edit().putString("s_dll", dlls).putString("argv", argv).commit();
-						((EditTextPreference) findPreference("argv")).setText(argv);
 						break;
 					case ListActivity.REQUEST_MAP_SELECT:
 						argv = CommandParser.addParam(CommandParser.removeAll(argv, "+map"), "+map "+result);
 						getSharedPreferences("dedicated", 0).edit().putString("s_map", result).putString("argv", argv).commit();
-						((EditTextPreference) findPreference("argv")).setText(argv);
 						break;
 					case ListActivity.REQUEST_BASEDIR_SELECT:
 						getSharedPreferences("dedicated", 0).edit().putString("basedir", result).commit();
@@ -128,7 +136,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 								argv = CommandParser.removeAll(argv, "-game");
 							}
 							getSharedPreferences("dedicated", 0).edit().putString("s_game", result.equals("valve") ? "" : result).putString("s_map", "").putString("s_dll", "").putString("argv", argv).commit();
-							((EditTextPreference) findPreference("argv")).setText(argv);
 						}
 						break;
 				}
