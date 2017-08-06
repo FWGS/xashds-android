@@ -161,8 +161,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 				break;
 			case "s_console":
 				boolean isConsole = (boolean) newValue;
-				argv = getSharedPreferences("dedicated", 0).getString("argv", "-dev 5 -dll dlls/hl.dll");
-
 				if (isConsole) argv = CommandParser.addParam(argv, "-console");
 					else argv = argv.replace("-console", "");
 				break;

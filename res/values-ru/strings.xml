@@ -43,7 +43,7 @@
 	<string name="h_map">Например: crossfire</string>
 	<string name="h_dlls">Например: dlls/decay.dll</string>
 	<string name="h_game">Например: gearbox; decay</string>
-	<string name="h_cmd">Отправить - долгое нажатие</string>
+	<string name="h_cmd">Введите команду</string>
 
 	<string name="v_isdev">Включить режим разработчика</string>
 	<string name="v_isconsole">Включить консоль</string>
