@@ -64,7 +64,7 @@ public class DedicatedService extends Service {
         iconRes = R.drawable.logo_wait;
 		
         isStarted = true;
-        game = CommandParser.parseSingleParameter(intent.getStringExtra("argv"), "-game");
+        game = CommandParser.parseSingleParameter(cmdArgs, "-game");
         if (game == "") game = "hl";
         updateNotification(DedicatedStatics.MESS_BINARIES_STARTING);
 

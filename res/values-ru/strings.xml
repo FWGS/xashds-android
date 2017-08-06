@@ -36,9 +36,9 @@
 	
 	<string name="l_save">Сохранить настройки!</string>
 	
-	<string name="l_game">Имя папки с игрой или модом (для Half-Life оставьте пустым)</string>
-	<string name="l_dlls">Пути к dll\'ям сервера (относительно директории мода)</string>
-	<string name="l_map">Имя стартовой карты</string>
+	<string name="l_game">Папка с игрой или модом</string>
+	<string name="l_dlls">DLL\'и сервера</string>
+	<string name="l_map">Стартовая карта</string>
 	<string name="l_rcon">Пароль для удалённого (rcon) контроля</string>
 	
 	<string name="l_scut_name">Название ярлыка: </string>

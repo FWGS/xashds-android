@@ -31,7 +31,7 @@ public class ShortcutCreatorActivity extends Activity
 		
 		sname = new EditText(this);
 		sname.setLayoutParams(lp);
-		String name = CommandParser.parseSingleParameter(DedicatedActivity.argsString, "-game");
+		String name = DedicatedStatics.getGame(this);
 		if (name.equals("")) name = "Half-Life";
 		sname.setText(name+" server");
 		
@@ -101,8 +101,8 @@ public class ShortcutCreatorActivity extends Activity
 		shortcutIntent.putExtra("automode", launchm.isChecked());
 		shortcutIntent.putExtra("translator", DedicatedStatics.getTranslator(this));
 		shortcutIntent.putExtra("files", DedicatedActivity.filesDir);
-		shortcutIntent.putExtra("game", DedicatedActivity.gamePath);
-		shortcutIntent.putExtra("argv", DedicatedActivity.argsString);
+		shortcutIntent.putExtra("game", DedicatedStatics.getBaseDir(this));
+		shortcutIntent.putExtra("argv", DedicatedStatics.getArgv(this));
 
 		Intent addIntent = new Intent();
 		addIntent

@@ -39,10 +39,10 @@
 	
 	<string name="l_save">Save settings!</string>
 	
-	<string name="l_game">Game or mod folder name</string>
-	<string name="l_dlls">Game or mod dlls names (relative to mod root)</string>
+	<string name="l_game">Game or mod folder</string>
+	<string name="l_dlls">Server DLL\'s</string>
     <string name="l_dlls_sm">Long tap for interactive menu</string>
-	<string name="l_map">Startup map name</string>
+	<string name="l_map">Start map</string>
 	<string name="l_rcon">Server control (rcon) password</string>
 	
 	<string name="l_scut_name">Shortcut name: </string>
@@ -62,6 +62,8 @@
 	<string name="v_iscoop">Game mode: coop</string>
 	<string name="v_ispublic">Internet server</string>
 	<string name="v_islan">LAN server</string>
-	
+
+	<string name="pr_basedir">Game folder location</string>
+
 	<string name="t_about1">XashDS Andoid (v1.2-forked)\nOriginal app by: mittorn (FWGS team)\nFork by: GregTheMadMonk (Greg)\n\nSpecial thanks to:\n-Uncle Mike for Xash3D\n-FWGS team for Xash3D FWGS and first XashDS\n-Valve for Half-Life and GoldSrc</string>
 </resources>

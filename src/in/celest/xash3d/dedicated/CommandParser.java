@@ -100,7 +100,7 @@ public class CommandParser {
 
     public static String addParam(String args, String param)
     {
-        if (args.charAt(args.length() - 1) != ' ')  args += " ";
+        if (!args.equals("")) if (args.charAt(args.length() - 1) != ' ')  args += " ";
         args += param;
         return format(args);
     }

@@ -6,7 +6,7 @@
 		<Preference
 			android:key="basedir"
 			android:summary="Game files directory"
-			android:title="Base directory"
+			android:title="@string/pr_basedir"
 			/>
 		<CheckBoxPreference
 			android:key="newxash"
@@ -36,6 +36,10 @@
 			android:key="s_map"
 			android:title="@string/l_map"
 			/>
+		<EditTextPreference
+			android:key="s_rcon"
+			android:title="@string/l_rcon"
+			/>
 		<CheckBoxPreference
 			android:key="s_dev"
 			android:title="@string/v_isdev"
@@ -53,6 +57,10 @@
 		<CheckBoxPreference
 			android:key="s_coop"
 			android:title="Enable coop"
+			/>
+		<CheckBoxPreference
+			android:key="s_public"
+			android:title="Is public server?"
 			/>
 	</PreferenceCategory>
 </PreferenceScreen>

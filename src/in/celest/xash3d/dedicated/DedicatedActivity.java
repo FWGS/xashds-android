@@ -23,21 +23,17 @@ public class DedicatedActivity extends Activity {
 	static ScrollView scroll;
 	private Button startButton;
 	private Button launchXash;
-	
+
 	static String filesDir;
 	static boolean isScrolling;
 
 	static String argsString;
-	static String gamePath;
 
-	static boolean isDev = false;
-	
 	static boolean isNewBinary = false;
 
 	static LayoutParams buttonParams;
 
 	static boolean isRunned = false;
-	static boolean tab = true;
 	
 	static boolean 	autostarted;
 	static boolean 	autolaunch;
@@ -137,8 +133,6 @@ public class DedicatedActivity extends Activity {
 
 	private void printText(String str)
 	{
-		//TextView line = new TextView(this);
-		//line.setText(str);
 		ConsoleView line = new ConsoleView(this);
 		line.addString(str);
 		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
@@ -155,7 +149,6 @@ public class DedicatedActivity extends Activity {
 			}
 		}, 200);
 		isScrolling = true;
-		//croll.fullScroll(ScrollView.FOCUS_DOWN);
 	}
 
 	public void printLog(String strin)
@@ -254,8 +247,6 @@ public class DedicatedActivity extends Activity {
 		
 		isNewBinary = getSharedPreferences("dedicated", 0).getBoolean("newxash", false);
 		DedicatedStatics.chstr(isNewBinary);
-
-		getActionBar().setDisplayHomeAsUpEnabled(false);
 	}
 
 	@Override
@@ -294,7 +285,7 @@ public class DedicatedActivity extends Activity {
 		unpackAssets();
 		Intent dedicatedServer = new Intent(DedicatedActivity.this, DedicatedService.class);
 		dedicatedServer.putExtra("argv", argsString);
-		dedicatedServer.putExtra("path", gamePath);
+		dedicatedServer.putExtra("path", DedicatedStatics.getBaseDir(this));
 		dedicatedServer.putExtra("translator", DedicatedStatics.getTranslator(this));
 		dedicatedServer.putExtra("files", filesDir);
 		this.startService(dedicatedServer);
@@ -458,8 +449,8 @@ public class DedicatedActivity extends Activity {
 		
 		int size = (int) getResources().getDimension(android.R.dimen.app_icon_size);
 		
-		String game = CommandParser.parseSingleParameter(argsString, "-game");
-		String gamedirstring = gamePath+"/"+(game.length()!=0?game:"valve");
+		String game = DedicatedStatics.getGame(this);
+		String gamedirstring = DedicatedStatics.getBaseDir(this)+"/"+(game.length()!=0?game:"valve");
 		try
 		{
 			icon = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(gamedirstring+"/icon.png"), size, size, false);

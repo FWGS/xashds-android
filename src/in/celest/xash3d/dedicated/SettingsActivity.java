@@ -15,22 +15,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 		
 		PreferenceManager m = getPreferenceManager();
 		m.setSharedPreferencesName("dedicated");
-
-		argv = getSharedPreferences("dedicated", 0).getString("argv", "-dev 5 -dll dlls/hl.dll");
-		getSharedPreferences("dedicated", 0).edit().
-				putString("s_game", CommandParser.parseSingleParameter(argv, "-game")).
-				putString("s_dll", CommandParser.parseMultipleParameter(argv, "-dll")).
-				putString("s_map", CommandParser.parseSingleParameter(argv, "+map")).
-				putBoolean("s_dev", CommandParser.parseLogicParameter(argv, "-dev")).
-				putBoolean("s_console", CommandParser.parseLogicParameter(argv, "-console")).
-				putBoolean("s_log", CommandParser.parseLogicParameter(argv, "-log")).
-				putBoolean("s_coop", CommandParser.parseLogicParameter(argv, "+coop")).
-				putString("s_dll", CommandParser.parseMultipleParameter(argv, "-dll")).
-                putString("s_game", CommandParser.parseSingleParameter(argv, "-game")).
-				putString("s_map", CommandParser.parseSingleParameter(argv, "+map")).
-				commit();
 		
 		addPreferencesFromResource(R.xml.stng_prefs);
+		updateAllPrefs(true);
 		
 		findPreference("basedir").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
@@ -43,6 +30,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 				return true;
 			}
 		});
+
+		findPreference("translator").setOnPreferenceChangeListener(this);
 
         findPreference("s_game").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -72,6 +61,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 				return true;
 			}
 		});
+
+		findPreference("s_rcon").setOnPreferenceChangeListener(this);
 		
 		ListPreference translators = (ListPreference) findPreference("translator");
 		if(System.getProperty("ro.product.cpu.abi") == "x86")
@@ -94,6 +85,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 		findPreference("s_console").setOnPreferenceChangeListener(this);
 		findPreference("s_dev").setOnPreferenceChangeListener(this);
 		findPreference("s_coop").setOnPreferenceChangeListener(this);
+		findPreference("s_public").setOnPreferenceChangeListener(this);
 	}
 
 	@Override
@@ -140,6 +132,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 						}
 						break;
 				}
+
+				updateAllPrefs(false);
 		}
 				
 		super.onActivityResult(requestCode, resultCode, data);
@@ -153,22 +147,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 		{
 			case "argv":
 				argv = (String) newValue;
-				((CheckBoxPreference) findPreference("s_console")).setChecked(CommandParser.parseLogicParameter(argv, "-console"));
-				((CheckBoxPreference) findPreference("s_dev")).setChecked(CommandParser.parseLogicParameter(argv, "-dev"));
-				((CheckBoxPreference) findPreference("s_log")).setChecked(CommandParser.parseLogicParameter(argv, "-log"));
-				((CheckBoxPreference) findPreference("s_coop")).setChecked(CommandParser.parseLogicParameter(argv, "+coop"));
-				getSharedPreferences("dedicated", 0).edit().
-						putString("s_game", CommandParser.parseSingleParameter(argv, "-game")).
-						putString("s_dll", CommandParser.parseMultipleParameter(argv, "-dll")).
-						putString("s_map", CommandParser.parseSingleParameter(argv, "+map")).
-						putBoolean("s_dev", CommandParser.parseLogicParameter(argv, "-dev")).
-						putBoolean("s_console", CommandParser.parseLogicParameter(argv, "-console")).
-						putBoolean("s_log", CommandParser.parseLogicParameter(argv, "-log")).
-						putBoolean("s_coop", CommandParser.parseLogicParameter(argv, "+coop")).
-						putString("s_dll", CommandParser.parseMultipleParameter(argv, "-dll")).
-                        putString("s_game", CommandParser.parseSingleParameter(argv, "-game")).
-						putString("s_map", CommandParser.parseSingleParameter(argv, "+map")).
-						commit();
 				break;
 			case "s_console":
 				boolean isConsole = (boolean) newValue;
@@ -187,10 +165,21 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 				if (isCoop) argv = CommandParser.addParam(argv.replace("+deathmatch 1", ""), "+coop 1");
 					else argv = CommandParser.addParam(argv.replace("+coop 1", ""), "+deathmatch 1");
 				break;
+			case "s_public":
+				argv = ((boolean) newValue)?CommandParser.addParam(argv, "+public 1"):argv.replace("+public 1", "");
+				break;
+			case "translator":
+				getSharedPreferences("dedicated", 0).edit().putString("translator", (String) newValue).commit();
+				break;
+			case "s_rcon":
+				String pass = (String) newValue;
+				argv = CommandParser.removeAll(argv, "+rcon_password");
+				if (!pass.equals("")) argv = CommandParser.addParam(argv, "+rcon_password "+pass);
+				break;
 		}
 
-		((EditTextPreference) findPreference("argv")).setText(argv);
 		getSharedPreferences("dedicated", 0).edit().putString("argv", argv).commit();
+		updateAllPrefs(false);
 
 		return true;
 	}
@@ -203,5 +192,45 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 			r[i] = new Integer(i).toString();
 		}
 		return r;
+	}
+
+	private void updateAllPrefs(boolean reloadArgv)
+	{
+		//update argv
+		if (reloadArgv) argv = getSharedPreferences("dedicated", 0).getString("argv", "-dev 5 -dll dlls/hl.dll");
+		//re-save preferences
+		getSharedPreferences("dedicated", 0).edit().
+				putString("s_game", CommandParser.parseSingleParameter(argv, "-game")).
+				putString("s_dll", CommandParser.parseMultipleParameter(argv, "-dll")).
+				putString("s_map", CommandParser.parseSingleParameter(argv, "+map")).
+				putBoolean("s_dev", CommandParser.parseLogicParameter(argv, "-dev")).
+				putBoolean("s_console", CommandParser.parseLogicParameter(argv, "-console")).
+				putBoolean("s_log", CommandParser.parseLogicParameter(argv, "-log")).
+				putBoolean("s_coop", CommandParser.parseLogicParameter(argv, "+coop")).
+				putString("s_dll", CommandParser.parseMultipleParameter(argv, "-dll")).
+				putString("s_game", CommandParser.parseSingleParameter(argv, "-game")).
+				putString("s_map", CommandParser.parseSingleParameter(argv, "+map")).
+				putString("s_rcon", CommandParser.parseSingleParameter(argv, "+rcon_password")).
+				putBoolean("s_public", CommandParser.parseLogicParameter(argv, "+public")).
+				commit();
+
+		//set preferences values
+		((CheckBoxPreference) findPreference("s_console")).setChecked(CommandParser.parseLogicParameter(argv, "-console"));
+		((CheckBoxPreference) findPreference("s_dev")).setChecked(CommandParser.parseLogicParameter(argv, "-dev"));
+		((CheckBoxPreference) findPreference("s_log")).setChecked(CommandParser.parseLogicParameter(argv, "-log"));
+		((CheckBoxPreference) findPreference("s_coop")).setChecked(CommandParser.parseLogicParameter(argv, "+coop"));
+		((CheckBoxPreference) findPreference("s_public")).setChecked(CommandParser.parseLogicParameter(argv, "+public"));
+
+		((EditTextPreference) findPreference("argv")).setText(argv);
+		((EditTextPreference) findPreference("s_rcon")).setText(CommandParser.parseSingleParameter(argv, "+rcon_password"));
+
+		//set preferences show values
+		findPreference("basedir").setSummary(DedicatedStatics.getBaseDir(this));
+		findPreference("translator").setSummary(DedicatedStatics.getTranslator(this));
+		findPreference("argv").setSummary(argv);
+		findPreference("s_game").setSummary((CommandParser.parseSingleParameter(argv, "-game")=="")?"valve":CommandParser.parseSingleParameter(argv, "-game"));
+		findPreference("s_dll").setSummary(CommandParser.parseMultipleParameter(argv, "-dll"));
+		findPreference("s_map").setSummary(CommandParser.parseSingleParameter(argv, "+map"));
+		findPreference("s_rcon").setSummary(CommandParser.parseSingleParameter(argv, "+rcon_password"));
 	}
 }
