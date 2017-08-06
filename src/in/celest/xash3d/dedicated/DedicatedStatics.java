@@ -39,8 +39,29 @@ public class DedicatedStatics
 		return context.getSharedPreferences("dedicated", 0).getString("basedir", "/sdcard/xash");
 	}
 	
+	public static String getArgv(Context context)
+	{
+		return context.getSharedPreferences("dedicated", 0).getString("argv", "-dev 5 -dll dlls/hl.dll");
+	}
+	
 	public static String getGame(Context context)
 	{
 		return CommandParser.parseSingleParameter(context.getSharedPreferences("dedicated", 0).getString("argv", "-dev 5 -dll dlls/hl.dll"), "-game");
+	}
+	
+	public static String getTranslator(Context context)
+	{
+		int i = Integer.valueOf(context.getSharedPreferences("dedicated", 0).getString("translator", "0"));
+		String[] t = DedicatedActivity.listTranslators();
+		if (i < t.length) return t[i];
+			else {
+				context.getSharedPreferences("dedicated", 0).edit().putString("translator", "0").commit();
+				return t[0];
+			}
+	}
+	
+	public static int getTranslatorIndex(Context context)
+	{
+		return Integer.valueOf(context.getSharedPreferences("dedicated", 0).getString("translator", "0"));
 	}
 }

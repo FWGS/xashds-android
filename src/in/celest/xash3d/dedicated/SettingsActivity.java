@@ -74,9 +74,21 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 		});
 		
 		ListPreference translators = (ListPreference) findPreference("translator");
-		translators.setEntries(DedicatedActivity.listTranslators());
-		translators.setDefaultValue("0");
-		translators.setEntryValues(makeValues(DedicatedActivity.listTranslators()));
+		if(System.getProperty("ro.product.cpu.abi") == "x86")
+		{
+			translators.setEntries(new String[]{"none"});
+			translators.setDefaultValue("0");
+			translators.setEntryValues(new String[]{"0"});
+			if (DedicatedStatics.getTranslatorIndex(this) != 0)
+				getSharedPreferences("dedicated", 0).edit().putString("translator", "0").commit();
+		} else {
+			translators.setEntries(DedicatedActivity.listTranslators());
+			translators.setDefaultValue("0");
+			translators.setEntryValues(makeValues(DedicatedActivity.listTranslators()));
+			if (DedicatedStatics.getTranslatorIndex(this) >= DedicatedActivity.listTranslators().length)
+				getSharedPreferences("dedicated", 0).edit().putString("translator", "0").commit();
+			
+			}
 
 		findPreference("argv").setOnPreferenceChangeListener(this);
 		findPreference("s_console").setOnPreferenceChangeListener(this);

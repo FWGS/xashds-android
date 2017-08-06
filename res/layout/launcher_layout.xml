@@ -8,32 +8,8 @@
 	<TextView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="@string/l_args"/>
-
-	<EditText
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:maxLines="1"
-		android:inputType="text"
-		android:id="@+id/cmdArgs"/>
-
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/l_path"/>
-
-	<EditText
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:maxLines="1"
-		android:inputType="text"
-		android:id="@+id/baseDir"/>
-
-	<Spinner
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:id="@+id/translatorSelector"/>
-
+		android:text="@string/l_args"
+		android:id="@+id/lnch_info"/>
 	<LinearLayout
 		android:layout_height="wrap_content"
 		android:layout_width="wrap_content"

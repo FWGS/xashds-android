@@ -99,7 +99,7 @@ public class ShortcutCreatorActivity extends Activity
 		shortcutIntent.putExtra("autostart", true);
 		shortcutIntent.putExtra("autolaunch", launch.isChecked());
 		shortcutIntent.putExtra("automode", launchm.isChecked());
-		shortcutIntent.putExtra("translator", DedicatedActivity.translator);
+		shortcutIntent.putExtra("translator", DedicatedStatics.getTranslator(this));
 		shortcutIntent.putExtra("files", DedicatedActivity.filesDir);
 		shortcutIntent.putExtra("game", DedicatedActivity.gamePath);
 		shortcutIntent.putExtra("argv", DedicatedActivity.argsString);
