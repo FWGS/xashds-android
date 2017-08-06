@@ -68,12 +68,10 @@ public class CommandParser {
     {
         for (int i = args.indexOf(param); i >= 0; i = args.indexOf(param)) {
             int j = i;
-            boolean f = true;
             while (j < args.length())
             {
                 if (j < args.length()-1)
-                    if (args.charAt(j) == ' ')
-                        if (!((args.charAt(j+1) != '+') || (args.charAt(j+1) != '-'))) break;
+                    if ((args.charAt(j) == ' ') && ((args.charAt(j+1) == '+') || (args.charAt(j+1) == '-'))) break;
                 j++;
             }
             args = args.replace(args.substring(i, j), "");

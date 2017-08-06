@@ -31,7 +31,7 @@
 			android:key="s_dll"
 			android:title="@string/l_dlls"
 			android:summary="@string/l_dlls_sm"
-			/>
+				/>
 		<Preference
 			android:key="s_map"
 			android:title="@string/l_map"
