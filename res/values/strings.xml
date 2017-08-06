@@ -11,7 +11,7 @@
 	
 	<string name="b_refresh_cache">Refresh files</string>
 	
-	<string name="b_master">Server master</string>
+	<string name="b_master">Server wizard</string>
 
 	<string name="b_about">About</string>
 	
@@ -58,4 +58,7 @@
 
 	<string name="t_about1">XashDS Andoid (v1.2-forked)\nOriginal app by: mittorn (FWGS team)\nFork by: GregTheMadMonk (Greg)\n\nSpecial thanks to:\n-Uncle Mike for Xash3D\n-FWGS team for Xash3D FWGS and first XashDS\n-Valve for Half-Life and GoldSrc</string>
 	<string name="l_remdlls">Clear DLL\'s</string>
+	<string name="l_newxash_s">Experimental new XashDS binary from 0.19.x-server</string>
+	<string name="l_translator">Select translator</string>
+	<string name="l_appsettings">App setttings</string>
 </resources>

@@ -56,4 +56,7 @@
 	<string name="pr_basedir">Папка с игрой</string>
 	<string name="b_settings">Настройки...</string>
 	<string name="l_remdlls">Очистить DLL\'и</string>
+	<string name="l_newxash_s">Экспериментальная сборка XashDS с 0.19.x-server</string>
+	<string name="l_translator">Эмулятор</string>
+	<string name="l_appsettings">Настройки приложения</string>
 </resources>

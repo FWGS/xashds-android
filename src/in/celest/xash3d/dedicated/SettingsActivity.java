@@ -115,11 +115,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 						}
 						argv = CommandParser.addParam(CommandParser.removeAll(argv, "-dll"), CommandParser.makeParamArgString(dlls, "-dll"));
 
-						getSharedPreferences("dedicated", 0).edit().putString("s_dll", dlls).putString("argv", argv).commit();
+						getSharedPreferences("dedicated", 0).edit().putString("s_dll", dlls).commit();
 						break;
 					case ListActivity.REQUEST_MAP_SELECT:
 						argv = CommandParser.addParam(CommandParser.removeAll(argv, "+map"), "+map "+result);
-						getSharedPreferences("dedicated", 0).edit().putString("s_map", result).putString("argv", argv).commit();
+						getSharedPreferences("dedicated", 0).edit().putString("s_map", result).commit();
 						break;
 					case ListActivity.REQUEST_BASEDIR_SELECT:
 						getSharedPreferences("dedicated", 0).edit().putString("basedir", result).commit();
@@ -135,11 +135,15 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 							} else {
 								argv = CommandParser.removeAll(argv, "-game");
 							}
-							getSharedPreferences("dedicated", 0).edit().putString("s_game", result.equals("valve") ? "" : result).putString("s_map", "").putString("s_dll", "").putString("argv", argv).commit();
+							argv = CommandParser.sort(argv);
+							getSharedPreferences("dedicated", 0).edit().putString("s_game", result.equals("valve") ? "" : result).putString("s_map", "").putString("s_dll", "").commit();
 						}
 						break;
 				}
 
+
+				argv = CommandParser.sort(argv);
+				getSharedPreferences("dedicated", 0).edit().putString("argv", argv).commit();
 				updateAllPrefs(false);
 		}
 				
@@ -185,6 +189,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 				break;
 		}
 
+		argv = CommandParser.sort(argv);
 		getSharedPreferences("dedicated", 0).edit().putString("argv", argv).commit();
 		updateAllPrefs(false);
 

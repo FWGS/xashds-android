@@ -27,11 +27,15 @@ public class CommandParser {
     }
 
     public static String parseSingleParameter(String args, String param) {
+        String ret = "";
         int i = args.indexOf(param);
         if (i != -1) {
             i += new String(param).length() + 1;
-            return wordFrom(args, i);
-        } else return "";
+            ret = wordFrom(args, i);
+        } else ret = "";
+
+        if (!ret.equals("")) return ((ret.charAt(0) == '+') || (ret.charAt(0) == '-')) ? "" : ret;
+        else return "";
     }
 
     public static boolean parseLogicParameter(String args, String param) {
@@ -50,7 +54,8 @@ public class CommandParser {
             else first = false;
             ret += wordFrom(args, i);
         }
-        return ret;
+        if (!ret.equals("")) return ((ret.charAt(0) == '+') || (ret.charAt(0) == '-')) ? "" : ret;
+            else return "";
     }
 
     public static int paramCount(String args, String param)
@@ -78,6 +83,43 @@ public class CommandParser {
         }
 
         return format(args);
+    }
+
+    public static String sort(String args)
+    {
+        String[] argsByPriority = new String[]
+                {
+                        "-dev",
+                        "-console",
+                        "-log",
+                        "-game",
+                        "-dll",
+                        "+rcon_password",
+                        "+map"
+                };
+        String ret = "";
+        String param;
+
+        for (int i = 0; i < argsByPriority.length; i++)
+        {
+            args = format(args);
+            param = argsByPriority[i];
+
+            if (parseLogicParameter(args, param))   //only if param exists
+            {
+                if (parseMultipleParameter(args, param).equals(""))
+                {
+                    ret = addParam(ret, param); //if logic parameter
+                }
+                else {
+                    ret = addParam(ret, makeParamArgString(parseMultipleParameter(args, param), param));
+                }
+
+                args = removeAll(args, param);
+            }
+        }
+
+        return addParam(ret, format(args));
     }
 
     public static String format(String args)
