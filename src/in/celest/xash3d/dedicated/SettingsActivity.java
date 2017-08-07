@@ -94,6 +94,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 		findPreference("argv").setOnPreferenceChangeListener(this);
 		findPreference("s_console").setOnPreferenceChangeListener(this);
 		findPreference("s_dev").setOnPreferenceChangeListener(this);
+		findPreference("s_log").setOnPreferenceChangeListener(this);
 		findPreference("s_coop").setOnPreferenceChangeListener(this);
 		findPreference("s_public").setOnPreferenceChangeListener(this);
 	}
@@ -168,6 +169,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 				boolean isDev = (boolean) newValue;
 				if (isDev) argv = CommandParser.addParam(argv, "-dev 3");
 					else argv = argv.replace("-dev "+CommandParser.parseSingleParameter(argv, "-dev"), "");
+				break;
+			case "s_log":
+				boolean isLog = (boolean) newValue;
+				if (isLog) argv = CommandParser.addParam(argv, "-log");
+					else argv = argv.replace("-log", "");
 				break;
 			case "s_coop":
 				boolean isCoop = (boolean) newValue;

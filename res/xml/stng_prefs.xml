@@ -52,9 +52,7 @@
 			/>
 		<CheckBoxPreference
 			android:key="s_log"
-			android:defaultValue="false"
 			android:title="@string/v_islog"
-			android:enabled="false"
 			/>
 		<CheckBoxPreference
 			android:key="s_coop"
