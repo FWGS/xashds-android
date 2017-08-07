@@ -15,6 +15,13 @@
 			android:key="translator"
 			android:title="@string/l_translator"
 			/>
+		<EditTextPreference
+			android:key="a_maxloglines"
+			android:inputType="number"
+			android:defaultValue="512"
+			android:title="@string/pr_maxloglength"
+			android:summary="@string/pr_maxloglines_s"
+			/>
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/b_master">

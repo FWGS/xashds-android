@@ -134,7 +134,7 @@ public class DedicatedActivity extends Activity {
 		ConsoleView line = new ConsoleView(this);
 		line.addString(str);
 		line.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		if(output.getChildCount() > 1024)
+		if(DedicatedStatics.getMaxLogLength(this) != 0) if(output.getChildCount() > DedicatedStatics.getMaxLogLength(this)-1)
 			output.removeViewAt(0);
 
 		output.addView(line);

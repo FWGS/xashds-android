@@ -59,4 +59,6 @@
 	<string name="l_newxash_s">Экспериментальная сборка XashDS с 0.19.x-server</string>
 	<string name="l_translator">Эмулятор</string>
 	<string name="l_appsettings">Настройки приложения</string>
+    <string name="pr_maxloglength">Количество сообщений лога</string>
+	<string name="pr_maxloglines_s">Оставьте 0, чтобы хранить все сообщения в памяти</string>
 </resources>

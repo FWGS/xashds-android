@@ -64,4 +64,9 @@ public class DedicatedStatics
 	{
 		return Integer.valueOf(context.getSharedPreferences("dedicated", 0).getString("translator", "0"));
 	}
+
+	public static int getMaxLogLength(Context context)
+	{
+		return Integer.valueOf(context.getSharedPreferences("dedicated", 0).getString("a_maxloglines", "512"));
+	}
 }
