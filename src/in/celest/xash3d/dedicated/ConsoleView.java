@@ -21,9 +21,6 @@ public class ConsoleView extends View
 	
 	private static ConsoleView highlighted = null;
 
-	//private static int bgcolor = null;
-	
-	private float tx, ty;
 	private float h, w;
 	
 	ConsoleView(Context context)
@@ -134,7 +131,6 @@ public class ConsoleView extends View
 			
 			y += deltay;
 		}
-		//canvas.drawText("HelloWorld", 50, 50, basictext);
 		
 		h = y;
 	}

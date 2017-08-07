@@ -5,15 +5,12 @@ import android.view.*;
 import android.widget.*;
 import android.widget.LinearLayout.LayoutParams;
 
-
-import android.test.*;public class AboutActivity extends Activity
+public class AboutActivity extends Activity
 {
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
-		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		LinearLayout mainlayout = new LinearLayout(this);
 		mainlayout.setLayoutParams((new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT)));

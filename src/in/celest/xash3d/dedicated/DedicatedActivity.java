@@ -163,7 +163,7 @@ public class DedicatedActivity extends Activity {
 	}
 
 	//Launcher initialization
-	//Called on activity start and on maser close
+	//Called on activity start
 	private void initLauncher()
 	{
 		setTitle(R.string.launcher_head);
@@ -278,6 +278,7 @@ public class DedicatedActivity extends Activity {
 		}
 	}
 
+	//default server start function
 	public void startServer()
 	{
 		unpackAssets();
@@ -288,7 +289,8 @@ public class DedicatedActivity extends Activity {
 		dedicatedServer.putExtra("files", filesDir);
 		this.startService(dedicatedServer);
 	}
-	
+
+	//start server with custom parameters (as on autostart from shortcut)
 	public void startServer(String game, String filesPath, String argv, String ctranslator)
 	{
 		getIcon();
@@ -317,12 +319,6 @@ public class DedicatedActivity extends Activity {
 	}
 
 	@Override
-	protected void onPause()
-	{
-		super.onPause();
-	}
-
-	@Override
 	protected void onResume()
 	{
 		initLauncher();
@@ -346,6 +342,7 @@ public class DedicatedActivity extends Activity {
 		return false;
 	}
 
+	//unpack asset and set it's mode to 777
 	public void unpackAsset(String name) throws Exception {
 		printText("Unpacking "+name+"...");
 		AssetManager assetManager = getApplicationContext().getAssets();
@@ -358,6 +355,8 @@ public class DedicatedActivity extends Activity {
 		}
 		out.close(); 
 		in.close();
+		printText("Changing permissions...");
+		Runtime.getRuntime().exec("chmod 777 " + filesDir + "/" +name);
 		printText("[OK]\n");
 	}
 	
@@ -370,23 +369,15 @@ public class DedicatedActivity extends Activity {
 			if(!f.exists() || (getPackageManager().getPackageInfo(getPackageName(), 0).versionCode != getSharedPreferences("dedicated", 0).getInt("lastversion", 1)) )
 			{
 				//Unpack files now
-				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 				unpackAsset("xash");
-				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
 				unpackAsset("xash_sse2");
-				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-				unpackAsset("start-translator.sh");
-				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-				unpackAsset("tracker");
-				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-				unpackAsset("qemu-i386-static");
-				
 				unpackAsset("xash-old");
-				
-				printText("[OK]\nSetting permissions.\n");
-				//scroll.fullScroll(ScrollView.FOCUS_DOWN);
-				Runtime.getRuntime().exec("chmod 777 " + filesDir + "/xash " + filesDir + "/xash_sse2 " + filesDir + "/tracker " + filesDir + "/qemu-i386-static "+filesDir+"/xash-old ").waitFor();
-				
+				unpackAsset("start-translator.sh");
+				unpackAsset("tracker");
+				unpackAsset("qemu-i386-static");
+
+				printText("[OK]\n");
+
 				getSharedPreferences("dedicated", 0).edit().putInt("lastversion", getPackageManager().getPackageInfo(getPackageName(), 0).versionCode).commit();
 			}
 		} catch (Exception e) {}
