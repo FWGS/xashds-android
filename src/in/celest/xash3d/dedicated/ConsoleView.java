@@ -10,7 +10,7 @@ import android.widget.*;
 public class ConsoleView extends View
 {
 	private List<String> strings = new ArrayList();
-	
+
 	private Paint bg = new Paint();
 	private Paint basictext = new Paint();
 	
@@ -20,6 +20,8 @@ public class ConsoleView extends View
 	private int defTextCol = Color.WHITE;
 	
 	private static ConsoleView highlighted = null;
+
+	//private static int bgcolor = null;
 	
 	private float tx, ty;
 	private float h, w;
@@ -27,8 +29,8 @@ public class ConsoleView extends View
 	ConsoleView(Context context)
 	{
 		super(context);
-		
-		bg.setColor(Color.BLACK);
+
+		bg.setColor(Color.TRANSPARENT);
 		basictext.setColor(defTextCol);
 	}
 
@@ -41,7 +43,7 @@ public class ConsoleView extends View
 		
 		h = canvas.getHeight();
 		w = canvas.getWidth();
-		
+
 		//paint bg
 		canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), bg);
 		
@@ -149,7 +151,7 @@ public class ConsoleView extends View
 		if (isSelected)
 		{
 			defTextCol = Color.WHITE;
-			bg.setColor(Color.BLACK);
+			bg.setColor(Color.TRANSPARENT);
 			isSelected = false;
 			
 			String text = removeColorcodes(strings.get(strings.size()-1));
@@ -235,7 +237,7 @@ public class ConsoleView extends View
 		if (isSelected)
 		{
 			defTextCol = Color.WHITE;
-			bg.setColor(Color.BLACK);
+			bg.setColor(Color.TRANSPARENT);
 			isSelected = false;
 		} else {
 			defTextCol = Color.BLACK;
