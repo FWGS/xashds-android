@@ -19,13 +19,15 @@
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
-			android:id="@+id/startButton"/>
+			android:id="@+id/startButton"
+			android:visibility="gone"/>
 
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:text="@string/b_start_xash"
-			android:id="@+id/startXash"/>
+			android:id="@+id/startXash"
+			android:visibility="gone"/>
 
 	</LinearLayout>
 

@@ -24,6 +24,8 @@ public class DedicatedActivity extends Activity {
 	private Button startButton;
 	private Button launchXash;
 
+	private MenuItem launchi = null;
+
 	static String filesDir;
 	static boolean isScrolling;
 
@@ -224,7 +226,7 @@ public class DedicatedActivity extends Activity {
 					startXash();
 				}
 			});
-		launchXash.setEnabled(DedicatedService.canConnect);
+		setCanConnect(DedicatedService.canConnect);
 
 		startButton = (Button) findViewById(R.id.startButton);
 		// Set launch button title here
@@ -252,10 +254,16 @@ public class DedicatedActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(Menu.NONE, 1, Menu.NONE, R.string.b_refresh_cache);
-		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_about);
-		menu.add(Menu.NONE, 3, Menu.NONE, R.string.b_scut);
-		menu.add(Menu.NONE, 4, Menu.NONE, R.string.b_settings);
+		menu.add(Menu.NONE, 1, Menu.NONE, R.string.b_settings);
+		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_refresh_cache);
+		menu.add(Menu.NONE, 3, Menu.NONE, R.string.b_about);
+		menu.add(Menu.NONE, 4, Menu.NONE, R.string.b_scut);
+		menu.add(Menu.NONE, 5, Menu.NONE, isRunned?R.string.b_start_stop:R.string.b_start_launch).setIcon(isRunned?R.drawable.stop:R.drawable.play).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		if (isXashInstalled()) {
+			launchi = menu.add(Menu.NONE, 6, Menu.NONE, R.string.b_start_xash);
+			launchi.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			setCanConnect(DedicatedService.canConnect);
+		}
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -264,16 +272,31 @@ public class DedicatedActivity extends Activity {
 	{
 		switch (item.getItemId()) {
 			case 1:
-				refreshCache();
+				startActivity(new Intent(DedicatedActivity.this, SettingsActivity.class));
 				return true;
 			case 2:
-				startActivity(new Intent(DedicatedActivity.this, AboutActivity.class));
+				refreshCache();
 				return true;
 			case 3:
-				createShortcut();
+				startActivity(new Intent(DedicatedActivity.this, AboutActivity.class));
 				return true;
 			case 4:
-				startActivity(new Intent(DedicatedActivity.this, SettingsActivity.class));
+				createShortcut();
+				return true;
+			case 5:
+				isRunned = !isRunned;
+				startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
+
+				if (isRunned) {
+					startServer();
+				} else {
+					stopServer();
+				}
+
+				item.setIcon(isRunned?R.drawable.stop:R.drawable.play);
+				return true;
+			case 6:
+				startXash();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -392,7 +415,11 @@ public class DedicatedActivity extends Activity {
 				@Override
 				public void run()
 				{
-					launchXash.setEnabled(can);
+					if (launchXash != null) launchXash.setEnabled(can);
+					if (launchi != null) {
+						launchi.setEnabled(can);
+						launchi.setIcon(can ? R.drawable.join : R.drawable.join_disabled);
+					}
 					if (can&&autolaunch&&autostarted)
 					{
 						autolaunch = false;
