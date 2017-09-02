@@ -80,6 +80,8 @@ public class DedicatedActivity extends Activity {
 		{
 			Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
 		}
+
+		unpackAssets();
 		
 		if(getIntent().getBooleanExtra("autostart", false))
 		{

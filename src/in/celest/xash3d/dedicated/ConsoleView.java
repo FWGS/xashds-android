@@ -3,8 +3,6 @@ import android.view.*;
 import android.content.*;
 import android.graphics.*;
 import java.util.*;
-import android.util.*;
-import org.apache.http.impl.*;
 import android.widget.*;
 
 public class ConsoleView extends View
