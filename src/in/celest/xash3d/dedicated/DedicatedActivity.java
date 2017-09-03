@@ -294,6 +294,7 @@ public class DedicatedActivity extends Activity {
 				}
 
 				item.setIcon(isRunned?R.drawable.stop:R.drawable.play);
+				item.setTitle(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 				return true;
 			case 6:
 				startXash();
