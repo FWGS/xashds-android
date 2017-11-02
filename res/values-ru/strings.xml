@@ -16,6 +16,8 @@
 
 	<string name="b_scut">Создать ярлык</string>
 	
+	<string name="b_clean">Очистить лог</string>
+	
 	<string name="b_close">Закрыть</string>
 
 	<string name="b_newxash">Новый XashDS</string>

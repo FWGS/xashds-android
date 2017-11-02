@@ -255,12 +255,13 @@ public class DedicatedActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(Menu.NONE, 1, Menu.NONE, R.string.b_settings);
-		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_refresh_cache);
-		menu.add(Menu.NONE, 3, Menu.NONE, R.string.b_about);
-		menu.add(Menu.NONE, 4, Menu.NONE, R.string.b_scut);
-		menu.add(Menu.NONE, 5, Menu.NONE, isRunned?R.string.b_start_stop:R.string.b_start_launch).setIcon(isRunned?R.drawable.stop:R.drawable.play).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_clean);
+		menu.add(Menu.NONE, 3, Menu.NONE, R.string.b_refresh_cache);
+		menu.add(Menu.NONE, 4, Menu.NONE, R.string.b_about);
+		menu.add(Menu.NONE, 5, Menu.NONE, R.string.b_scut);
+		menu.add(Menu.NONE, 6, Menu.NONE, isRunned?R.string.b_start_stop:R.string.b_start_launch).setIcon(isRunned?R.drawable.stop:R.drawable.play).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		if (isXashInstalled()) {
-			launchi = menu.add(Menu.NONE, 6, Menu.NONE, R.string.b_start_xash);
+			launchi = menu.add(Menu.NONE, 7, Menu.NONE, R.string.b_start_xash);
 			launchi.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			setCanConnect(DedicatedService.canConnect);
 		}
@@ -275,15 +276,19 @@ public class DedicatedActivity extends Activity {
 				startActivity(new Intent(DedicatedActivity.this, SettingsActivity.class));
 				return true;
 			case 2:
-				refreshCache();
+				output.removeAllViews();
+				DedicatedStatics.logView.clear();
 				return true;
 			case 3:
-				startActivity(new Intent(DedicatedActivity.this, AboutActivity.class));
+				refreshCache();
 				return true;
 			case 4:
-				createShortcut();
+				startActivity(new Intent(DedicatedActivity.this, AboutActivity.class));
 				return true;
 			case 5:
+				createShortcut();
+				return true;
+			case 6:
 				isRunned = !isRunned;
 				startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 
@@ -296,7 +301,7 @@ public class DedicatedActivity extends Activity {
 				item.setIcon(isRunned?R.drawable.stop:R.drawable.play);
 				item.setTitle(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 				return true;
-			case 6:
+			case 7:
 				startXash();
 				return true;
 			default:
