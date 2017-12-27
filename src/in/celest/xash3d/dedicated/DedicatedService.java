@@ -120,6 +120,7 @@ public class DedicatedService extends Service {
 		canConnect = false;
 		if (DedicatedStatics.launched != null) DedicatedStatics.launched.setCanConnect(canConnect);
 		printText(DedicatedStatics.MESS_SERVICE_KILLED);
+		if (DedicatedStatics.launched != null) DedicatedStatics.launched.printInfo();
 	}
 
     @Override

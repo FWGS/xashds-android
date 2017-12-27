@@ -34,6 +34,11 @@ public class DedicatedStatics
 		}
 	}
 	
+	public static boolean isNewBin()
+	{
+		return XASH_BINARY == XASH_BINARY_NEW;
+	}
+	
 	public static String getBaseDir(Context context)
 	{
 		return context.getSharedPreferences("dedicated", 0).getString("basedir", "/sdcard/xash");

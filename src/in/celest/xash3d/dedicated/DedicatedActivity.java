@@ -249,6 +249,25 @@ public class DedicatedActivity extends Activity {
 		
 		isNewBinary = getSharedPreferences("dedicated", 0).getBoolean("newxash", false);
 		DedicatedStatics.chstr(isNewBinary);
+		
+		printLog("Welcome to XashDSAndroid v1.3-forked BETA");
+		printInfo();
+	}
+	
+	void printInfo()
+	{
+		printLog("=========================================");
+		printLog("Base Directory: ");
+		printLog(DedicatedStatics.getBaseDir(this));
+		printLog("Game Directory: ");
+		printLog(DedicatedStatics.getGame(this).equals("")?"valve":DedicatedStatics.getGame(this));
+		printLog("Console Parameters: ");
+		printLog(DedicatedStatics.getArgv(this));
+		printLog("Translator: ");
+		printLog(DedicatedStatics.getTranslator(this));
+		printLog("Xash Binary: ");
+		printLog(DedicatedStatics.isNewBin()?"New":"\"Classic\"");
+		printLog("=========================================");
 	}
 
 	@Override
@@ -278,6 +297,9 @@ public class DedicatedActivity extends Activity {
 			case 2:
 				output.removeAllViews();
 				DedicatedStatics.logView.clear();
+
+				printLog("Welcome to XashDSAndroid v1.3-forked BETA");
+				printInfo();
 				return true;
 			case 3:
 				refreshCache();
