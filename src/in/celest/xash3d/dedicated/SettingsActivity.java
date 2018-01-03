@@ -3,6 +3,7 @@ import android.preference.*;
 import android.os.*;
 import android.content.*;
 import android.provider.Browser;
+import android.view.*;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener
 {
@@ -12,6 +13,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		PreferenceManager m = getPreferenceManager();
 		m.setSharedPreferencesName("dedicated");
@@ -248,5 +251,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 		findPreference("s_dll").setSummary(CommandParser.parseMultipleParameter(argv, "-dll"));
 		findPreference("s_map").setSummary(CommandParser.parseSingleParameter(argv, "+map"));
 		findPreference("s_rcon").setSummary(CommandParser.parseSingleParameter(argv, "+rcon_password"));
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		finish();
+		return super.onOptionsItemSelected(item);
 	}
 }
