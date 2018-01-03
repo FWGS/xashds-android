@@ -45,6 +45,14 @@ public class DedicatedActivity extends Activity {
 	
 	static Bitmap 	gameIcon = null;
 
+	private final int MITEMID_CLEAR			= 1;
+	private final int MITEMID_REFRESH 		= 2;
+	private final int MITEMID_ABOUT 		= 3;
+	private final int MITEMID_SCUT 			= 4;
+	private final int MITEMID_START 		= 5;
+	private final int MITEMID_JOIN 			= 6;
+	private final int MITEMID_SETTINGS		= 7;
+
 	private static String[] commands =
 			{
 					"say",
@@ -249,9 +257,11 @@ public class DedicatedActivity extends Activity {
 		
 		isNewBinary = getSharedPreferences("dedicated", 0).getBoolean("newxash", false);
 		DedicatedStatics.chstr(isNewBinary);
-		
-		printLog("Welcome to XashDSAndroid v1.3-forked BETA");
-		printInfo();
+
+		if (! isRunned) {
+			printLog("Welcome to XashDSAndroid v1.3-forked BETA");
+			printInfo();
+		}
 	}
 	
 	void printInfo()
@@ -273,17 +283,17 @@ public class DedicatedActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(Menu.NONE, 1, Menu.NONE, R.string.b_clean);
-		menu.add(Menu.NONE, 2, Menu.NONE, R.string.b_refresh_cache);
-		menu.add(Menu.NONE, 3, Menu.NONE, R.string.b_about);
-		menu.add(Menu.NONE, 4, Menu.NONE, R.string.b_scut);
-		menu.add(Menu.NONE, 5, Menu.NONE, isRunned?R.string.b_start_stop:R.string.b_start_launch).setIcon(isRunned?R.drawable.stop:R.drawable.play).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		menu.add(Menu.NONE, MITEMID_CLEAR, Menu.NONE, R.string.b_clean);
+		menu.add(Menu.NONE, MITEMID_REFRESH, Menu.NONE, R.string.b_refresh_cache);
+		menu.add(Menu.NONE, MITEMID_ABOUT, Menu.NONE, R.string.b_about);
+		menu.add(Menu.NONE, MITEMID_SCUT, Menu.NONE, R.string.b_scut);
+		menu.add(Menu.NONE, MITEMID_START, Menu.NONE, isRunned?R.string.b_start_stop:R.string.b_start_launch).setIcon(isRunned?R.drawable.stop:R.drawable.play).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		if (isXashInstalled()) {
-			launchi = menu.add(Menu.NONE, 6, Menu.NONE, R.string.b_start_xash);
+			launchi = menu.add(Menu.NONE, MITEMID_JOIN, Menu.NONE, R.string.b_start_xash);
 			launchi.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			setCanConnect(DedicatedService.canConnect);
 		}
-		menu.add(Menu.NONE, 7, Menu.NONE, R.string.b_settings).setIcon(R.drawable.settings).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		menu.add(Menu.NONE, MITEMID_SETTINGS, Menu.NONE, R.string.b_settings).setIcon(R.drawable.settings).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -291,26 +301,26 @@ public class DedicatedActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId()) {
-			case 7:
+			case MITEMID_SETTINGS:
 				startActivity(new Intent(DedicatedActivity.this, SettingsActivity.class));
 				return true;
-			case 1:
+			case MITEMID_CLEAR:
 				output.removeAllViews();
 				DedicatedStatics.logView.clear();
 
 				printLog("Welcome to XashDSAndroid v1.3-forked BETA");
 				printInfo();
 				return true;
-			case 2:
+			case MITEMID_REFRESH:
 				refreshCache();
 				return true;
-			case 3:
+			case MITEMID_ABOUT:
 				startActivity(new Intent(DedicatedActivity.this, AboutActivity.class));
 				return true;
-			case 4:
+			case MITEMID_SCUT:
 				createShortcut();
 				return true;
-			case 5:
+			case MITEMID_START:
 				isRunned = !isRunned;
 				startButton.setText(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 
@@ -323,7 +333,7 @@ public class DedicatedActivity extends Activity {
 				item.setIcon(isRunned?R.drawable.stop:R.drawable.play);
 				item.setTitle(isRunned?R.string.b_start_stop:R.string.b_start_launch);
 				return true;
-			case 6:
+			case MITEMID_JOIN:
 				startXash();
 				return true;
 			default:
@@ -562,7 +572,7 @@ public class DedicatedActivity extends Activity {
 		{
 			//DedicatedService.sendCmd(s);
 			try { sendRconCommand("localhost", 27015, CommandParser.parseSingleParameter(DedicatedStatics.getArgv(this), "+rcon_password"), s); } catch (Exception e) {}
-			printText("/> "+s);
+			printText("\033[33mrcon_input\033[32m>\033[0m "+s);
 		}
 	}
 	
