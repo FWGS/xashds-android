@@ -400,7 +400,13 @@ public class DedicatedActivity extends Activity {
 		{
 			getPackageManager().getPackageInfo("in.celest.xash3d.hl", PackageManager.GET_ACTIVITIES);
 			return true;
-		} catch (PackageManager.NameNotFoundException e) {}
+		} catch (PackageManager.NameNotFoundException e) {
+			try 
+			{
+				getPackageManager().getPackageInfo("in.celest.xash3d.hl.test", PackageManager.GET_ACTIVITIES);
+				return true;
+			} catch (PackageManager.NameNotFoundException e1) {}
+		}
 
 		return false;
 	}
